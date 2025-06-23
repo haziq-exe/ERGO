@@ -1,6 +1,8 @@
 # ERGO: Entropy-guided Resetting for Generation Optimization
 
-![ERGO Diagram](READMEimg/Representative_Diagram.pdf)
+<p align="center">
+  <img src="READMEimg/Representative_Diagram.png" alt="ERGO Diagram" width="600"/>
+</p>
 
 This repository accompanies the paper **"ERGO: Entropy-guided Resetting for Generation Optimization in Multi-turn Language Models"** (under review at INTERPLAY 25' @ COLM 2025). It contains all code necessary to replicate our experiments and evaluate ERGO’s performance across a suite of multi-turn generation tasks.
 
