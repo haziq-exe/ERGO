@@ -57,10 +57,24 @@ Use the `Combined_ContextResets.ipynb` notebook in the `Evaluation/` directory. 
 * Parses the `.json` output files.
 * Computes per-run scores and aggregates them into P̄, A90, and U90.
 
+## Experimental Results
+
+Compared to standard multi-turn conversations, ERGO significantly improves multi-turn generation across five tasks and several LLMs (GPT-4o, GPT-4.1, Phi-4, LLaMA 3.1–8B):
+
+• +56.6% improvement in average performance (𝑃̄).
+
+• +24.7% increase in best-case aptitude (𝐴₉₀).
+
+• −35.3% reduction in unreliability (𝑈₉₀–₁₀).
+
+• Outperforms repetition-based methods (SNOWBALL, RECAP) and naive resets (random, fixed).
+
+Please refer to Section 5 of the paper for more info.
+
 ## License
 
 Released under an anonymous open-source license for review purposes.
 
 ---
 
-For any questions related to experimental design or evaluation metrics, please refer to the methodology described in the paper.
+For any questions related to experimental design or evaluation metrics, please refer to the methodology described in the paper or feel free to email haziqkhalid04@gmail.com
