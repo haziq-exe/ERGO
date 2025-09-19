@@ -36,7 +36,7 @@
 </td>
 <td align="center" style="white-space: nowrap; width: 33%;">
 <h3>35.3%</h3>
-<b>Unreliability Reduction</b>
+<b>Decrease in Unreliability</b>
 </td>
 </tr>
 </table>
