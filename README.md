@@ -5,11 +5,8 @@
 ![ERGO Banner](READMEimg/Representative_Diagram.png)
 
 [![Paper](https://img.shields.io/badge/📄_Read_Paper-8A2BE2?style=for-the-badge)](https://github.com/haziq-exe/ERGO)
-
 [![License](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
-
 [![Python](https://img.shields.io/badge/Python-3.8+-green?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
-
 [![Status](https://img.shields.io/badge/Status-Beta_Testing-orange?style=for-the-badge)](https://github.com/haziq-exe/ERGO/issues)
 
 **Transforming Multi-turn Conversations with Uncertainty-Aware Context Noise Distillation**
@@ -26,6 +23,7 @@
 
 ## Core Features
 
+<div align="center">
 <table>
 <tr>
 <td width="33.333%" align="center">
@@ -51,6 +49,7 @@ Improved consistency
 </td>
 </tr>
 </table>
+</div>
 
 ## Quick Start
 
@@ -126,9 +125,9 @@ ERGO/
 
 ## Evaluated Tasks
 
-<div align="center">
-
 ERGO has been rigorously tested across five diverse generation tasks:
+
+<div align="center">
 
 | Task | Dataset | Description | Metric |
 |------|---------|-------------|--------|
@@ -148,7 +147,7 @@ ERGO has been rigorously tested across five diverse generation tasks:
 
 | Model | FULL | SHARDED | ERGO | **Relative % Improvement** |
 |-------|------|---------|----------|-------------|
-| GPT-4o | 79.2 | 51.4 | 74.1 | **+44.2%** |
+| <img src="READMEimg/OpenAI.png" width="20" alt="OpenAI"/> GPT-4o  | 79.2 | 51.4 | 74.1 | **+44.2%** |
 | GPT-4.1 | 83.6 | 56.6 | 77.0 | **+36.0%** |
 | GPT-4o-mini | 73.8 | 44.3 | 71.8 | **+62.1%** | 
 | Phi-4 | 64.6 | 36.4 | 59.2 | **+62.6%** |
