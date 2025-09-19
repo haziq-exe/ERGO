@@ -1,11 +1,13 @@
 # core/model.py
 from openai import OpenAI
 import math
+import os
 from typing import List, Dict, Any, Tuple
 from transformers import AutoTokenizer, AutoModelForCausalLM, logging
 import torch
 
 # logging.set_verbosity_info()
+# Need to remove api_key from here, is passed as an environment variable.
 
 class BaseModel:
     def __init__(self, model_name: str, api_key: str = None):
@@ -96,7 +98,7 @@ class OpenAIModel(BaseModel):
 
     def __init__(self, model_name, api_key, temperature, max_tokens, top_logprobs: int = 20):
         super().__init__(model_name, api_key)
-        self.client = OpenAI(api_key=self.api_key)
+        self.client = OpenAI(api_key = os.environ["OPENAI_KEY"])
         self.temperature = temperature
         self.max_tokens = max_tokens
         self.top_logprobs = top_logprobs
