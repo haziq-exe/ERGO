@@ -11,7 +11,7 @@
 
 **Transforming Multi-turn Conversations with Uncertainty-Aware Context Noise Distillation**
 
-• [Paper (Coming Soon)](https://github.com/haziq-exe/ERGO) • [Quick Start](#-quick-start) • [Results](#-key-results) • [Contact](mailto:haziqkhalid04@gmail.com) •
+• [Paper (Coming Soon)](https://github.com/haziq-exe/ERGO) • [Quick Start](https://github.com/haziq-exe/ERGO?tab=readme-ov-file#quick-start) • [Results](https://github.com/haziq-exe/ERGO?tab=readme-ov-file#key-results) • [Contact](mailto:haziqkhalid04@gmail.com) •
 
 </div>
 
