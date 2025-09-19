@@ -147,7 +147,7 @@ ERGO has been rigorously tested across five diverse generation tasks:
 
 | Model | FULL | SHARDED | ERGO | **Relative % Improvement** |
 |-------|------|---------|----------|-------------|
-| <img src="READMEimg/OpenAI.png" width="20" alt="OpenAI"/> GPT-4o  | 79.2 | 51.4 | 74.1 | **+44.2%** |
+| <img src="https://img.shields.io/badge/OpenAI-412991?style=flat&logo=openai&logoColor=white" alt="OpenAI"/>GPT-4o  | 79.2 | 51.4 | 74.1 | **+44.2%** |
 | GPT-4.1 | 83.6 | 56.6 | 77.0 | **+36.0%** |
 | GPT-4o-mini | 73.8 | 44.3 | 71.8 | **+62.1%** | 
 | Phi-4 | 64.6 | 36.4 | 59.2 | **+62.6%** |
