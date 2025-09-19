@@ -28,11 +28,11 @@
 <tr>
 <td align="center" style="white-space: nowrap; width: 33%;">
 <h3>56.6%</h3>
-<b>Performance Gain</b>
+<b>Average Performance Gain</b>
 </td>
 <td align="center" style="white-space: nowrap; width: 33%;">
 <h3>24.7%</h3>
-<b>Aptitude Increase</b>
+<b>Peak Capability Increase</b>
 </td>
 <td align="center" style="white-space: nowrap; width: 33%;">
 <h3>35.3%</h3>
