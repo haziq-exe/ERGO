@@ -1,6 +1,6 @@
-# ERGO: Entropy-guided Resetting for Generation Optimization
-
 <div align="center">
+
+# ERGO: Entropy-guided Resetting for Generation Optimization
 
 ![ERGO Banner](READMEimg/Representative_Diagram.png)
 
@@ -11,7 +11,7 @@
 
 **Transforming Multi-turn Conversations with Uncertainty-Aware Intelligence**
 
-[📖 Paper](https://github.com/haziq-exe/ERGO) • [🚀 Quick Start](#-quick-start) • [📊 Results](#-key-results) • [📧 Contact](mailto:haziqkhalid04@gmail.com)
+[Paper (Coming Soon)](https://github.com/haziq-exe/ERGO) • [Quick Start](#-quick-start) • [Results](#-key-results) • [Contact](mailto:haziqkhalid04@gmail.com)
 
 </div>
 
@@ -29,21 +29,21 @@ Unlike traditional approaches that fight against model uncertainty, ERGO *embrac
 
 <table>
 <tr>
-<td width="33%" align="center">
+<td width="40%" align="center">
 
 ### 56.6%
 **Performance Gain**  
 Over standard baselines
 
 </td>
-<td width="33%" align="center">
+<td width="40%" align="center">
 
 ### 24.7%
 **Aptitude Increase**  
 Peak performance capability
 
 </td>
-<td width="33%" align="center">
+<td width="40%" align="center">
 
 ### 35.3%
 **Unreliability Reduction**  
@@ -61,8 +61,6 @@ Improved consistency
 # Clone the repository
 git clone https://github.com/haziq-exe/ERGO.git
 cd ERGO
-
-
 pip install -r requirements.txt
 ```
 
@@ -103,31 +101,33 @@ Run from root directory:
 python -m main.example_main
 ```
 
-## 📁 Repository Structure
+## Repository Structure
 
 ```
 ERGO/
 │
-├── 📊 evaluation/          # Evaluation metrics and scoring
+├── evaluation/          # Evaluation metrics and scoring
 │   └── evaluator.py
 │
-├── 🧠 core/               # Core ERGO implementation
+├── core/               # Core ERGO implementation
 │   ├── dataset.py         # Dataset handlers
 │   ├── model.py          # Model interfaces
 │   └── utils.py          # Utility functions
 │
-├── 🔬 experiments/        # Experiment runners
+├── experiments/        # Experiment runners
 │   ├── runEvaluation.py  # Evaluation pipeline
 │   └── runExperiment.py  # Main experiment logic
 │
-├── 🤖 generation/         # Generation strategies
+├── generation/         # Generation strategies
 │   └── generator.py      # ERGO generation logic
 │
-└── ✍️ main/              # Example scripts
+└── main/              # Example scripts
     └── example_main.py   # Quick start example
 ```
 
-## 🧪 Evaluated Tasks
+## Evaluated Tasks
+
+<div align="center">
 
 ERGO has been rigorously tested across five diverse generation tasks:
 
@@ -139,11 +139,13 @@ ERGO has been rigorously tested across five diverse generation tasks:
 | 🔧 **API Calls** | Berkeley FCL | Function calling from instructions | Call Validity |
 | 📝 **Data-to-Text** | ToTTo | Table caption generation | BLEU Score |
 
-## 📊 Key Results
+</div>
+
+## Key Results
 
 <div align="center">
 
-### Performance Across Models
+### Average Performance Across Models
 
 | Model | FULL | SHARDED | **ERGO** | Improvement |
 |-------|------|---------|----------|-------------|
@@ -157,12 +159,12 @@ ERGO has been rigorously tested across five diverse generation tasks:
 
 ## Important Notes
 
-> **Beta Status**: While the codebase is complete and functional, It is still in its early stages. You may encounter bugs – please report them via [Issues](https://github.com/haziq-exe/ERGO/issues).
+> **Beta Status**: While the codebase is complete and functional, It is still in its early stages. You may encounter bugs, these are being worked on.
 
 > **Documentation**: Comprehensive documentation is in development. For now, please refer to the paper for detailed methodology and theoretical foundations.
 
 
-## 📄 Citation
+## Citation
 
 If you use ERGO in your research, please cite our paper:
 
@@ -177,13 +179,13 @@ If you use ERGO in your research, please cite our paper:
 }
 ```
 
-## 📬 Contact
+## Contact
 
 **Lead Author**: Haziq Mohammad Khalid  
 📧 haziqkhalid04@gmail.com
 
 ---
 
-[⬆ Back to Top](#-ergo-entropy-guided-resetting-for-generation-optimization)
+[Back to Top](#-ergo-entropy-guided-resetting-for-generation-optimization)
 
 </div>
