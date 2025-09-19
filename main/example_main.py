@@ -1,7 +1,7 @@
 from experiments.runExperiment import RunExperiment
 from experiments.runEvaluation import RunEvaluation
 
-# If model name has 'gpt' in it, it will use OpenAI API, 
+# If model name has 'gpt' in it, it will use OpenAI API, "OPENAI_KEY" key must be set in environment variable
 # otherwise it will try to load the model locally with HuggingFace
 
 Example_Experiment = RunExperiment(

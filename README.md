@@ -54,6 +54,8 @@ cd ERGO
 pip install -r requirements.txt
 ```
 
+- To use OpenAI models you will need the environment variable "OPENAI_KEY" to be set to your key.
+
 ### Basic Usage
 
 ```python
