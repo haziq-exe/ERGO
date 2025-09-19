@@ -353,11 +353,8 @@ class DataToTextEvaluator(Evaluator):
             for y in range(numQ):
                 score = D2TEval.D2T_evaluator_function(output[y]['final_output'], D2T[y])
                 run_scores.append(score)
-                output[y]["score"] = score
-
+                output[i]["score"] = score
+                
             avg_score = np.mean(run_scores) if run_scores else 0.0
+            print(f"Run {x} Average Score: {avg_score}")
             scores.append(avg_score)
-
-        average = np.mean(scores)
-        
-        return scores, average
