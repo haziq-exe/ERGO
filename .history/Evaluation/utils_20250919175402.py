@@ -99,6 +99,7 @@ class ActionsEvalUtils(EvalUtils):
         score = 1 if result["valid"] else 0
         return {"is_correct": result["valid"], "score": score, "error": result["error"]}
 
+
 class DataToTextEvalUtils(EvalUtils):
     def __init__(self):
         super().__init__()

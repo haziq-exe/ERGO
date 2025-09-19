@@ -4,14 +4,12 @@ import sacrebleu
 import sys
 import tempfile
 import subprocess
-import sqlite3
-
 
 class EvalUtils:
     def __init__(self):
         pass
 
-class ActionsEvalUtils(EvalUtils):
+class APIEvalUtils(EvalUtils):
     def __init__(self):
         super().__init__()
 
@@ -99,7 +97,8 @@ class ActionsEvalUtils(EvalUtils):
         score = 1 if result["valid"] else 0
         return {"is_correct": result["valid"], "score": score, "error": result["error"]}
 
-class DataToTextEvalUtils(EvalUtils):
+
+class D2TEvalUtils(EvalUtils):
     def __init__(self):
         super().__init__()
 
@@ -149,18 +148,6 @@ class DatabaseEvalUtils(EvalUtils):
         # if not queries:
         #   queries.append(text)
         return queries
-
-    def run_query(db_path, sql):
-      conn = sqlite3.connect(db_path)
-      # decode any bytes with replacement on errors
-      conn.text_factory = lambda b: b.decode('utf-8', errors='replace')
-      cur  = conn.cursor()
-      try:
-          cur.execute(sql)
-          rows = cur.fetchall()
-      finally:
-          conn.close()
-      return rows
     
 class CodeEvalUtils(EvalUtils):
     def __init__(self):

@@ -335,29 +335,3 @@ class DatabaseEvaluator(Evaluator):
         overall = float(np.mean(avg)) if avg else 0.0
         print(f"Average = {overall}")
         return avg, overall
-    
-class DataToTextEvaluator(Evaluator):
-    def __init__(self, output_file):
-        super().__init__(output_file)
-    
-    def evaluate(self, numruns, numQ):
-        scores = []
-        D2TEval = DataToTextEvalUtils()
-        D2T = DataToText().load_data()
-        for x in range(numruns):
-            run_path = self.output_file + f"_run{x}.json"
-            with open(run_path, "r", encoding="utf-8") as f:
-                output = json.load(f)
-
-            run_scores = []
-            for y in range(numQ):
-                score = D2TEval.D2T_evaluator_function(output[y]['final_output'], D2T[y])
-                run_scores.append(score)
-                output[y]["score"] = score
-
-            avg_score = np.mean(run_scores) if run_scores else 0.0
-            scores.append(avg_score)
-
-        average = np.mean(scores)
-        
-        return scores, average
