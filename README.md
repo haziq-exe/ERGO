@@ -23,43 +23,12 @@ We evaluate ERGO on five generation tasks:
 
 ## Repository Structure
 
-```
-├── Evaluation
-│   └── Combined_ContextResets.ipynb
-|
-└── Running
-      └── GSM8K_ContextReset.ipynb
-      └── Coding_ContextReset.ipynb
-      └── DB_ContextReset.ipynb
-      └── D2T_ContextReset.ipynb
-      └── API_ContextReset.ipynb
-
-````
-
-- `Evaluation/Combined_ContextResets.ipynb`: Aggregates all experimental logs and computes performance metrics: average performance (P̄), aptitude (A90), and unreliability (U90–10).
-- `Running/`: Contains one notebook per dataset. Each notebook simulates multi-turn conversations with ERGO, using the OpenAI API. Results are stored in `.json` format for evaluation.
+TBD
 
 ## Usage Instructions
 
-### Prerequisites
-- Python 3.8+
-- OpenAI API access
-- Required packages listed in each notebook (typically includes `openai`, `tqdm`, `numpy`, etc.)
+TBD
 
-### Step 1: Run Multi-Turn Simulations
-
-Navigate to the `Running/` directory and execute the notebook corresponding to your target dataset. Each notebook:
-- Loads input prompts sharded across conversation turns.
-- Simulates multi-turn interactions using a selected LLM.
-- Applies entropy-based resets when uncertainty exceeds a calibrated threshold.
-- Stores the conversation logs and outputs in JSON format.
-
-### Step 2: Evaluate Results
-
-Use the `Combined_ContextResets.ipynb` notebook in the `Evaluation/` directory. This notebook:
-
-* Parses the `.json` output files.
-* Computes per-run scores and aggregates them into P̄, A90, and U90.
 
 ## Experimental Results
 
