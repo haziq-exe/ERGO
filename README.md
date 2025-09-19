@@ -9,9 +9,9 @@
 [![Python](https://img.shields.io/badge/Python-3.8+-green?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![Status](https://img.shields.io/badge/Status-Beta_Testing-orange?style=for-the-badge)](https://github.com/haziq-exe/ERGO/issues)
 
-**Transforming Multi-turn Conversations with Uncertainty-Aware Intelligence**
+**Transforming Multi-turn Conversations with Uncertainty-Aware Context Noise Distillation**
 
-[Paper (Coming Soon)](https://github.com/haziq-exe/ERGO) • [Quick Start](#-quick-start) • [Results](#-key-results) • [Contact](mailto:haziqkhalid04@gmail.com)
+• [Paper (Coming Soon)](https://github.com/haziq-exe/ERGO) • [Quick Start](#-quick-start) • [Results](#-key-results) • [Contact](mailto:haziqkhalid04@gmail.com) •
 
 </div>
 
@@ -21,29 +21,25 @@
 
 **ERGO** introduces a paradigm shift in handling multi-turn LLM conversations by treating uncertainty as a first-class signal. When large language models get "lost" in extended conversations, ERGO detects these moments through entropy spikes and strategically resets the context, recovering both accuracy and reliability. This repository contains all code necessary to replicate our experiments and evaluate ERGO’s performance across a suite of models and multi-turn generation tasks.
 
-### Key Innovation
-
-Unlike traditional approaches that fight against model uncertainty, ERGO *embraces* it, using Shannon entropy over next-token distributions as an internal behavioral signal to detect and correct conversational drift in real-time.
-
 ## Core Features
 
 <table>
 <tr>
-<td width="40%" align="center">
+<td width="33.333%" align="center">
 
 ### 56.6%
 **Performance Gain**  
 Over standard baselines
 
 </td>
-<td width="40%" align="center">
+<td width="33.333%" align="center">
 
 ### 24.7%
 **Aptitude Increase**  
 Peak performance capability
 
 </td>
-<td width="40%" align="center">
+<td width="33.333%" align="center">
 
 ### 35.3%
 **Unreliability Reduction**  
@@ -53,7 +49,7 @@ Improved consistency
 </tr>
 </table>
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -133,11 +129,11 @@ ERGO has been rigorously tested across five diverse generation tasks:
 
 | Task | Dataset | Description | Metric |
 |------|---------|-------------|--------|
-| 🧮 **Math** | GSM8K | Elementary math word problems | Exact Match |
-| 💻 **Code** | LiveCodeBench | Python function generation | Test Suite Pass |
-| 🗃️ **SQL** | Spider | Text-to-SQL query generation | Query Accuracy |
-| 🔧 **API Calls** | Berkeley FCL | Function calling from instructions | Call Validity |
-| 📝 **Data-to-Text** | ToTTo | Table caption generation | BLEU Score |
+| **Math** | GSM8K | Elementary math word problems | Exact Match |
+| **Code** | LiveCodeBench | Python function generation | Test Suite Pass |
+| **SQL** | Spider | Text-to-SQL query generation | Query Accuracy |
+| **API Calls** | Berkeley FCL | Function calling from instructions | Call Validity |
+| **Data-to-Text** | ToTTo | Table caption generation | BLEU Score |
 
 </div>
 
@@ -147,13 +143,13 @@ ERGO has been rigorously tested across five diverse generation tasks:
 
 ### Average Performance Across Models
 
-| Model | FULL | SHARDED | **ERGO** | Improvement |
+| Model | FULL | SHARDED | ERGO | **Relative % Improvement** |
 |-------|------|---------|----------|-------------|
-| GPT-4o | 79.2 | 51.4 | **75.6** | +47% |
-| GPT-4.1 | 86.5 | 46.0 | **77.2** | +68% |
-| GPT-4o-mini | 73.8 | 44.3 | **71.8** | +62% | 
-| Phi-4 | 62.0 | 35.1 | **59.2** | +69% |
-| LLaMA-3.1-8B | 35.7 | 29.4 | **50.9** | +73% |
+| GPT-4o | 79.2 | 51.4 | 74.1 | **+44.2%** |
+| GPT-4.1 | 83.6 | 56.6 | 77.0 | **+36.0%** |
+| GPT-4o-mini | 73.8 | 44.3 | 71.8 | **+62.1%** | 
+| Phi-4 | 64.6 | 36.4 | 59.2 | **+62.6%** |
+| LLaMA-3.1-8B | 46.0 | 28.7 | 50.9 | **+77.4%** |
 
 </div>
 
