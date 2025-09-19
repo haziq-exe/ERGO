@@ -1,4 +1,4 @@
-from eval_bfcl import ast_checker, ast_parse
+from .eval_bfcl import ast_checker, ast_parse
 import re
 import sacrebleu
 import sys

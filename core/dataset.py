@@ -7,9 +7,11 @@ class Dataset():
         self.dataset_name = dataset_name
         self.dataset_path = dataset_path
         self.data = []
-        self.base_system = None
         self.final_shard_instruct = ""
         self.connectors = ["oh also, ", "I just remembered, ", "sorry i forgot to say, ", "", "oh, and ", "FYI, "]
+
+    def get_base_system(self, i):
+        pass
 
     def __len__(self):
         return len(self.data)
@@ -21,14 +23,13 @@ class GSM8K(Dataset):
         self.final_shard_instruct = " Put your final answer between <Answer> tags."
     
     def get_base_system(self, i):
-        self.base_system = {
+        return {
         "role": "system",
         "content": (
             "You are a helpful math assistant. "
             "Put your final answer between <Answer> tags."
             )
         }
-        return self.base_system
 
     def load_data(self):
         data = []
@@ -48,14 +49,13 @@ class Database(Dataset):
         self.final_shard_instruct = " Include your complete new Query in your response."
 
     def get_base_system(self, i):
-        self.base_system = {
-        "role": "system",
-        "content": (
-            f"""\nYou are helping a user write SQL queries to a database. If something is not clear, you can ask the user to clarify what they need. The schema for the database being accessed is the following:\n{self.data[i]['schema_sql']}"""
-        )
+        return {
+            "role": "system",
+            "content": (
+                f"""\nYou are helping a user write SQL queries to a database. If something is not clear, you can ask the user to clarify what they need. The schema for the database being accessed is the following:\n{self.data[i]['schema_sql']}"""
+            )
         }
-        return self.base_system
-
+    
     def load_data(self):
         data = []
         with open(self.dataset_path, 'r') as f:
@@ -74,7 +74,7 @@ class Code(Dataset):
         self.final_shard_instruct = " Please include your entire Python Function in your response."
 
     def get_base_system(self, i):
-        self.base_system = {
+        return {
         "role": "system",
         "content": (
                 f"""You are an expert Python programmer. You will be given a question (problem specification) and will generate a correct Python program that matches the specification and passes all tests.
@@ -83,7 +83,6 @@ class Code(Dataset):
                 - [Standalone] Make sure that your answer consists of only one Python function at the top level. Do not wrap with a class or split into multiple functions."""
                 )
         }
-        return self.base_system
 
     def load_data(self):
         data = []
@@ -104,7 +103,7 @@ class Actions(Dataset):
 
 
     def get_base_system(self, i):
-        self.base_system = {
+        return {
         "role": "system",
         "content": (
             f"""You are an expert in composing functions. You are given a question and a set of possible functions. Based on the question, you will need to make one or more function/tool calls to achieve the purpose.
@@ -121,7 +120,6 @@ class Actions(Dataset):
                 {self.data[i]['function']}"""
             )
         }
-        return self.base_system
 
     def load_data(self):
         data = []
@@ -141,13 +139,12 @@ class DataToText(Dataset):
         self.final_shard_instruct = ""
 
     def get_base_system(self, i):
-        self.base_system = {
+        return {
         "role": "system",
         "content": (
             f"You are an analyst with an eye for detail that accomplishes tasks carefully and thoroughly."
         )
         }
-        return self.base_system
 
 
     def load_data(self):
