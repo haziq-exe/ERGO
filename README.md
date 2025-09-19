@@ -122,7 +122,7 @@ ERGO has been rigorously tested across five diverse generation tasks:
 <div align="center">
 
 | Task | Dataset | Description | Metric |
-|------|---------|-------------|--------|
+|:------:|:---------:|:-------------:|:--------:|
 | **Math** | GSM8K | Elementary math word problems | Exact Match |
 | **Code** | LiveCodeBench | Python function generation | Test Suite Pass |
 | **SQL** | Spider | Text-to-SQL query generation | Query Accuracy |
@@ -138,7 +138,7 @@ ERGO has been rigorously tested across five diverse generation tasks:
 ### Average Performance Across Models
 
 | Model | FULL | SHARDED | ERGO | **Relative Improvement** |
-|-------|------|---------|----------|-------------|
+|:-------:|:------:|:---------:|:----------:|:-------------:|
 | GPT-4o | 79.2 | 51.4 | 74.1 | **+44.2%** |
 | GPT-4.1 | 83.6 | 56.6 | 77.0 | **+36.0%** |
 | GPT-4o-mini | 73.8 | 44.3 | 71.8 | **+62.1%** | 
