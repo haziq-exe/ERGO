@@ -21,7 +21,7 @@
 
 **ERGO** introduces a paradigm shift in handling multi-turn LLM conversations by treating uncertainty as a first-class signal. When large language models get "lost" in extended conversations, ERGO detects these moments through entropy spikes and strategically resets the context, recovering both accuracy and reliability. This repository contains all code necessary to replicate our experiments and evaluate ERGO’s performance across a suite of models and multi-turn generation tasks.
 
-## Core Features
+## Core Results
 
 <div align="center">
 <table>
@@ -37,7 +37,7 @@ Over standard baselines
 
 ### 24.7%
 **Aptitude Increase**  
-Peak performance capability
+Peak-performance potential
 
 </td>
 <td width="33.333%" align="center">
@@ -131,11 +131,11 @@ ERGO has been rigorously tested across five diverse generation tasks:
 
 | Task | Dataset | Description | Metric |
 |------|---------|-------------|--------|
-| <img src="READMEimg/math.png" width="20" alt="Math"/> **Math** | GSM8K | Elementary math word problems | Exact Match |
-| <img src="READMEimg/Code.png" width="20" alt="Code"/> **Code** | LiveCodeBench | Python function generation | Test Suite Pass |
-| <img src="READMEimg/DB.png" width="20" alt="SQL"/> **SQL** | Spider | Text-to-SQL query generation | Query Accuracy |
-| <img src="READMEimg/api.png" width="20" alt="API"/> **API Calls** | Berkeley FCL | Function calling from instructions | Call Validity |
-| <img src="READMEimg/D2T.png" width="20" alt="D2T"/> **Data-to-Text** | ToTTo | Table caption generation | BLEU Score |
+| **Math** | GSM8K | Elementary math word problems | Exact Match |
+| **Code** | LiveCodeBench | Python function generation | Test Suite Pass |
+| **SQL** | Spider | Text-to-SQL query generation | Query Accuracy |
+| **API Calls** | Berkeley FCL | Function calling from instructions | Call Validity |
+| **Data-to-Text** | ToTTo | Table caption generation | BLEU Score |
 
 </div>
 
@@ -145,13 +145,13 @@ ERGO has been rigorously tested across five diverse generation tasks:
 
 ### Average Performance Across Models
 
-| Model | <img src="READMEimg/FULL.png" width="20" alt="FULL"/> FULL |<img src="READMEimg/SHARD.png" width="20" alt="SHARD"/> SHARDED | <img src="READMEimg/ERGO.png" width="20" alt="ERGO"/> ERGO | **Relative Improvement** |
+| Model | FULL | SHARDED | ERGO | **Relative Improvement** |
 |-------|------|---------|----------|-------------|
-| <img src="READMEimg/OpenAI.png" width="20" alt="OpenAI"/> GPT-4o  | 79.2 | 51.4 | 74.1 | **+44.2%** |
-| <img src="READMEimg/OpenAI.png" width="20" alt="OpenAI"/> GPT-4.1 | 83.6 | 56.6 | 77.0 | **+36.0%** |
-| <img src="READMEimg/OpenAI.png" width="20" alt="OpenAI"/> GPT-4o-mini | 73.8 | 44.3 | 71.8 | **+62.1%** | 
-| <img src="READMEimg/microsoft.png" width="20" alt="Microsoft"/> Phi-4 | 64.6 | 36.4 | 59.2 | **+62.6%** |
-| <img src="READMEimg/meta.png" width="20" alt="Meta"/> LLaMA-3.1-8B | 46.0 | 28.7 | 50.9 | **+77.4%** |
+| GPT-4o | 79.2 | 51.4 | 74.1 | **+44.2%** |
+| GPT-4.1 | 83.6 | 56.6 | 77.0 | **+36.0%** |
+| GPT-4o-mini | 73.8 | 44.3 | 71.8 | **+62.1%** | 
+| Phi-4 | 64.6 | 36.4 | 59.2 | **+62.6%** |
+| LLaMA-3.1-8B | 46.0 | 28.7 | 50.9 | **+77.4%** |
 
 </div>
 
