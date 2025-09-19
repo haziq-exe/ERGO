@@ -29,22 +29,19 @@
 <td width="33.333%" align="center">
 
 ### 56.6%
-**Performance Gain**  
-Over standard baselines
+**Average Performance Gain**  
 
 </td>
 <td width="33.333%" align="center">
 
 ### 24.7%
 **Aptitude Increase**  
-Peak-performance potential
 
 </td>
 <td width="33.333%" align="center">
 
 ### 35.3%
 **Unreliability Reduction**  
-Improved consistency
 
 </td>
 </tr>
