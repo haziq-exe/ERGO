@@ -24,29 +24,24 @@
 ## Core Results
 
 <div align="center">
-<table>
+<table style="table-layout: fixed; width: 100%;">
 <tr>
-<td width="33.333%" align="center">
-
-### 56.6%
-**Performance Gain**  
-
+<td align="center" style="white-space: nowrap; width: 33%;">
+<h3>56.6%</h3>
+<b>Performance Gain</b>
 </td>
-<td width="33.333%" align="center">
-
-### 24.7%
-**Aptitude Increase**  
-
+<td align="center" style="white-space: nowrap; width: 33%;">
+<h3>24.7%</h3>
+<b>Aptitude Increase</b>
 </td>
-<td width="33.33%" align="center" style="white-space: nowrap;">
-
-### 35.3%
-**Unreliability Reduction**  
-
+<td align="center" style="white-space: nowrap; width: 33%;">
+<h3>35.3%</h3>
+<b>Unreliability Reduction</b>
 </td>
 </tr>
 </table>
 </div>
+
 
 ## Quick Start
 
