@@ -2,8 +2,10 @@
 from openai import OpenAI
 import math
 from typing import List, Dict, Any, Tuple
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from transformers import AutoTokenizer, AutoModelForCausalLM, logging
 import torch
+
+# logging.set_verbosity_info()
 
 class BaseModel:
     def __init__(self, model_name: str, api_key: str = None):
@@ -26,17 +28,18 @@ class BaseModel:
 
 class LocalLLMModel(BaseModel):
 
-    def __init__(self, model_name, device, max_length, torch_dtype=torch.float16, temperature=1.0, do_sample=True):
+    def __init__(self, model_name, device, max_new_tokens, dtype=torch.float16, temperature=1.0, do_sample=True, device_map="auto"):
         super().__init__(model_name)
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
+        self.tokenizer = AutoTokenizer.from_pretrained(model_name,  trust_remote_code=True)
         self.model = AutoModelForCausalLM.from_pretrained(
             model_name,
-            torch_dtype=torch_dtype,
-            device_map="auto"
-        )
+            dtype=dtype,
+            device_map=device_map,
+             trust_remote_code=True
+        ).to(device)
         self.device = device
         self.temperature = temperature
-        self.max_length = max_length
+        self.max_new_tokens = max_new_tokens
         self.do_sample = do_sample
 
     def generate(self, messages):
@@ -56,7 +59,8 @@ class LocalLLMModel(BaseModel):
         with torch.no_grad():
             outputs = self.model.generate(
                 inputs.input_ids,
-                max_length=inputs.input_ids.shape[1] + self.max_length,
+                attention_mask=inputs.attention_mask,
+                max_new_tokens= self.max_new_tokens,
                 return_dict_in_generate=True,
                 output_scores=True,
                 do_sample=self.do_sample,

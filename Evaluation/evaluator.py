@@ -1,35 +1,29 @@
 import json
 from core.dataset import GSM8K, Code, Database, DataToText, Actions
-from utils import CodeEvalUtils, DatabaseEvalUtils, DataToTextEvalUtils, ActionsEvalUtils
+from .utils import CodeEvalUtils, DatabaseEvalUtils, DataToTextEvalUtils, ActionsEvalUtils
 import ast
 import numpy as np
 import re
 import os
 
 class Evaluator:
-    def __init__(self, output_file):
+    def __init__(self, output_file, dataset_path):
         """
         Initialize the Evaluator with an output file path.
         """
         self.output_file = output_file
-    
-    def load_outputs(self):
-        """
-        Load model outputs from the specified JSON file.
-        """
-        with open(self.output_file, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-        return data
+        self.dataset_path = dataset_path
+        
     
 class CodeEvaluator(Evaluator):
 
-    def __init__(self, output_file):
-        super().__init__(output_file)
+    def __init__(self, output_file, dataset_path):
+        super().__init__(output_file, dataset_path)
 
     def evaluate(self, numruns, numQ):
         finalcorr = []
         utils = CodeEvalUtils()
-        dataset = Code().load_data()
+        dataset = Code(self.dataset_path).load_data()
 
         for i in range(numruns):
             correct = []
@@ -96,20 +90,18 @@ class CodeEvaluator(Evaluator):
 
 class GSM8KEvaluator(Evaluator):
 
-    def __init__(self, output_file):
-        super().__init__(output_file)
+    def __init__(self, output_file, dataset_path):
+        super().__init__(output_file, dataset_path)
 
     def evaluate(self, numruns, numQ):
-        dataset = GSM8K().load_data()
+        dataset = GSM8K(self.dataset_path).load_data()
         all_runs = []
 
         for run in range(numruns):
-            run_path = self.output_file + f"_run{run}.json"
+            run_path = self.output_file.replace(".json", f"_run{run}.json")
 
-            orig_output_file = self.output_file
-            self.output_file = run_path
-            NRoutput = self.load_outputs()
-            self.output_file = orig_output_file
+            with open(run_path, "r", encoding="utf-8") as f:
+                NRoutput = json.load(f)
 
             corr = []
             for i in range(numQ):
@@ -142,7 +134,7 @@ class GSM8KEvaluator(Evaluator):
                 corr.append(1 if is_correct else 0)
                 NRoutput[i]["correct"] = bool(is_correct)
 
-                corrected_path = orig_output_file + f"_run{run}_CORRECTED.json"
+                corrected_path = run_path + f"_run{run}_CORRECTED.json"
                 with open(corrected_path, "w", encoding="utf-8") as f_out:
                     json.dump(NRoutput, f_out, indent=2)
 
@@ -162,13 +154,13 @@ class GSM8KEvaluator(Evaluator):
     
 class ActionsEvaluator(Evaluator):
 
-    def __init__(self, output_file):
-        super().__init__(output_file)
+    def __init__(self, output_file, dataset_path):
+        super().__init__(output_file, dataset_path)
 
     def evaluate(self, numruns, numQ):
 
         utils = ActionsEvalUtils()
-        dataset = Actions().load_data()
+        dataset = Actions(self.dataset_path).load_data()
 
         runs = []
         scores = []
@@ -243,12 +235,12 @@ class ActionsEvaluator(Evaluator):
         return scores, average_accuracy
     
 class DatabaseEvaluator(Evaluator):
-    def __init__(self, output_file):
-        super().__init__(output_file)
+    def __init__(self, output_file, dataset_path):
+        super().__init__(output_file, dataset_path)
     
     def evaluate(self, numruns, numQ, spider_DB_path):
         utils = DatabaseEvalUtils()
-        dataset = Database().load_data()
+        dataset = Database(self.dataset_path).load_data()
 
         data_path = self.output_file
         DB_FOLDER = spider_DB_path
@@ -337,13 +329,13 @@ class DatabaseEvaluator(Evaluator):
         return avg, overall
     
 class DataToTextEvaluator(Evaluator):
-    def __init__(self, output_file):
-        super().__init__(output_file)
-    
+    def __init__(self, output_file, dataset_path):
+        super().__init__(output_file, dataset_path)
+
     def evaluate(self, numruns, numQ):
         scores = []
         D2TEval = DataToTextEvalUtils()
-        D2T = DataToText().load_data()
+        D2T = DataToText(self.dataset_path).load_data()
         for x in range(numruns):
             run_path = self.output_file + f"_run{x}.json"
             with open(run_path, "r", encoding="utf-8") as f:

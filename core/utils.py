@@ -1,7 +1,6 @@
 # core/utils.py
 import json
-import os
-from typing import Dict, Any, List
+from pathlib import Path
 from .model import BaseModel
 from .dataset import Dataset
 
@@ -42,8 +41,10 @@ class Logger:
         """
         Save all logs to the output JSON file.
         """
-        if i:
-            out_path = self.output_file.replace(".json", f"_run{i}.json")
+
+        out_path = self.output_file.replace(".json", f"_run{i}.json")
+
+        Path(out_path).parent.mkdir(parents=True, exist_ok=True)
 
         with open(out_path, "w", encoding="utf-8") as f:
             json.dump(self.logs, f, indent=2, ensure_ascii=False)
