@@ -26,19 +26,19 @@
 <div align="center">
 <table>
 <tr>
-<td width="33.333%" align="center">
+<td  align="center">
 
 ### 56.6%
-**Performance Gain**  
+**Average Performance Gain**  
 
 </td>
-<td width="33.333%" align="center">
+<td  align="center">
 
 ### 24.7%
 **Aptitude Increase**  
 
 </td>
-<td width="33.333%" align="center">
+<td align="center">
 
 ### 35.3%
 **Unreliability Drop**  
