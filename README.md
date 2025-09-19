@@ -1,3 +1,7 @@
+# NOTE: *CODEBASE IS CURRENTLY BEING REFACTORED TO MAKE IT EASIER TO FORK AND RECREATE OUR EXPERIMENTS*
+
+
+
 # ERGO: Entropy-guided Resetting for Generation Optimization
 
 <p align="center">
