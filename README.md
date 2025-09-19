@@ -29,7 +29,7 @@
 <td width="33.333%" align="center">
 
 ### 56.6%
-**Average Performance Gain**  
+**Performance Gain**  
 
 </td>
 <td width="33.333%" align="center">
@@ -41,7 +41,7 @@
 <td width="33.333%" align="center">
 
 ### 35.3%
-**Unreliability Reduction**  
+**Unreliability Decrease**  
 
 </td>
 </tr>
