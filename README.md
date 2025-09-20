@@ -5,7 +5,6 @@
 ![ERGO Banner](READMEimg/Representative_Diagram.png)
 
 [![Paper](https://img.shields.io/badge/📄_Read_Paper-8A2BE2?style=for-the-badge)](https://github.com/haziq-exe/ERGO)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.8+-green?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![Status](https://img.shields.io/badge/Status-Beta_Testing-orange?style=for-the-badge)](https://github.com/haziq-exe/ERGO/issues)
 
