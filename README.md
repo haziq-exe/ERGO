@@ -11,7 +11,7 @@
 
 **Transforming Multi-turn Conversations with Uncertainty-Aware Context Noise Distillation**
 
-• [Paper (Coming Soon)](https://github.com/haziq-exe/ERGO) • [Quick Start](https://github.com/haziq-exe/ERGO?tab=readme-ov-file#quick-start) • [Results](https://github.com/haziq-exe/ERGO?tab=readme-ov-file#key-results) • [Contact](mailto:haziqkhalid04@gmail.com) •
+• [Paper (Coming Soon)](https://github.com/haziq-exe/ERGO) • [Quick Start](https://github.com/haziq-exe/ERGO?tab=readme-ov-file#quick-start) • [Results](https://github.com/haziq-exe/ERGO?tab=readme-ov-file#key-results) • [Contact](https://github.com/haziq-exe/ERGO?tab=readme-ov-file#contact) •
 
 </div>
 
@@ -100,23 +100,24 @@ python -m main.example_main
 ```
 ERGO/
 │
-├── evaluation/          # Evaluation metrics and scoring
+├── evaluation/         # Evaluation metrics and scoring
 │   └── evaluator.py
+|   └── utils.py 
 │
 ├── core/               # Core ERGO implementation
-│   ├── dataset.py         # Dataset handlers
-│   ├── model.py          # Model interfaces
-│   └── utils.py          # Utility functions
+│   ├── dataset.py         
+│   ├── model.py          
+│   └── utils.py          
 │
 ├── experiments/        # Experiment runners
-│   ├── runEvaluation.py  # Evaluation pipeline
-│   └── runExperiment.py  # Main experiment logic
+│   ├── runEvaluation.py 
+│   └── runExperiment.py  
 │
-├── generation/         # Generation strategies
-│   └── generator.py      # ERGO generation logic
+├── generation/         # Generate with ERGO
+│   └── generator.py
 │
 └── main/              # Example scripts
-    └── example_main.py   # Quick start example
+    └── example_main.py
 ```
 
 ## Evaluated Tasks
@@ -168,8 +169,7 @@ If you use ERGO in your research, please cite our paper:
   author={Khalid, Haziq Mohammad and Jeyaganthan, Athikash and Do, Timothy and 
           Fu, Yicheng and O'Brien, Sean and Sharma, Vasu and Zhu, Kevin},
   booktitle={Proceedings of the Conference on Uncertainty in Natural Language Processing (UncertaiNLP)},
-  year={2025},
-  organization={Algoverse AI Research}
+  year={2025}
 }
 ```
 
@@ -183,6 +183,6 @@ If you use ERGO in your research, please cite our paper:
 
 ---
 
-[Back to Top](#-ergo-entropy-guided-resetting-for-generation-optimization)
+[Back to Top](https://github.com/haziq-exe/ERGO?tab=readme-ov-file#ergo-entropy-guided-resetting-for-generation-optimization)
 
 </div>
