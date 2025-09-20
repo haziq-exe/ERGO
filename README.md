@@ -56,6 +56,8 @@ pip install -r requirements.txt
 
 - To use OpenAI models you will need the environment variable "OPENAI_KEY" to be set to your key.
 
+- You will need to downloaded the following [sharded dataset from Laban et al]{https://huggingface.co/datasets/microsoft/lost_in_conversation}
+
 ### Basic Usage
 
 ```python
@@ -72,7 +74,7 @@ experiment = RunExperiment(
 
 # Run ERGO on GSM8K dataset
 experiment.run_GSM8K(
-    dataset_path="sharded_dataset.json",
+    dataset_path="sharded_dataset.json", # path to sharded dataset from Laban et al.
     num_Qs=20,
     num_runs=1,
     threshold=0.5,
