@@ -176,6 +176,9 @@ If you use ERGO in your research, please cite our paper:
 **Lead Author**: Haziq Mohammad Khalid  
 📧 haziqkhalid04@gmail.com
 
+**Co-Author**: Timothy Do  
+📧 tim.do.info@gmail.com
+
 ---
 
 [Back to Top](#-ergo-entropy-guided-resetting-for-generation-optimization)
