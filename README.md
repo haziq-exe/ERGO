@@ -8,9 +8,7 @@
 [![Python](https://img.shields.io/badge/Python-3.8+-green?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![Status](https://img.shields.io/badge/Status-Beta_Testing-orange?style=for-the-badge)](https://github.com/haziq-exe/ERGO/issues)
 
-**Transforming Multi-turn Conversations with Uncertainty-Aware Context Noise Distillation**
-
-• [Paper (Coming Soon)](https://github.com/haziq-exe/ERGO) • [Quick Start](https://github.com/haziq-exe/ERGO?tab=readme-ov-file#quick-start) • [Results](https://github.com/haziq-exe/ERGO?tab=readme-ov-file#key-results) • [Contact](https://github.com/haziq-exe/ERGO?tab=readme-ov-file#contact) •
+• [Paper (Coming Soon)](https://github.com/haziq-exe/ERGO) • [Quick Start](https://github.com/haziq-exe/ERGO?tab=readme-ov-file#quick-start) • [Repository Structure](https://github.com/haziq-exe/ERGO?tab=readme-ov-file#repository-structure) • [Results](https://github.com/haziq-exe/ERGO?tab=readme-ov-file#key-results) • [Contact](https://github.com/haziq-exe/ERGO?tab=readme-ov-file#contact) •
 
 </div>
 
