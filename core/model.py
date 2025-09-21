@@ -80,9 +80,9 @@ class LocalLLMModel(BaseModel):
         new_tokens = response_ids[:, input_len:]
         response_only = self.tokenizer.batch_decode(new_tokens, skip_special_tokens=True)[0]
 
-        tokens_used = response_ids.shape[1] 
+        # tokens_used = response_ids.shape[1] 
 
-        return avg_entropy, response_only, tokens_used
+        return avg_entropy, response_only # tokens_used 
 
     def compute_entropy(self, probs: torch.Tensor) -> float:
         """
@@ -121,9 +121,9 @@ class OpenAIModel(BaseModel):
         token_logprobs = resp.choices[0].logprobs.content
 
         avg_entropy = self.compute_entropy(token_logprobs)
-        tokens_used = resp.usage.completion_tokens + resp.usage.prompt_tokens
+        # tokens_used = resp.usage.completion_tokens + resp.usage.prompt_tokens
 
-        return avg_entropy, generated_text, tokens_used
+        return avg_entropy, generated_text#, tokens_used
 
     def compute_entropy(self, token_logprobs: List[Dict[str, Any]]) -> float:
         """

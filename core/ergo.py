@@ -42,7 +42,7 @@ class Ergo:
             "I have a set of questions and/or statements, "
             "please REWRITE all the questions/statements so that they are in "
             "the most optimal order that is the easiest to understand. "
-            "DO NOT ANSWER ANY OF THE QUESTIONS, JUST REWRITE.\n"
+            "DO NOT ANSWER ANY OF THE QUESTIONS, JUST REWRITE. JUST RETURN THE REWRITTEN PROMPT\n"
             "Here are the instructions:\n"
         )
 
@@ -64,12 +64,15 @@ class Ergo:
         - Check entropy
         - If above threshold, rewrite prompt and regenerate
         """
-        avg_entropy, response, tokens_used = self.model.generate(sharded_prompt)
+        avg_entropy, response = self.model.generate(sharded_prompt)
         reset = False
         
         if avg_entropy - prev_entropy >= self.threshold:
             reset = True
             rewritten = self.rewrite_prompt(sharded_prompt, dataset)
-            avg_entropy, response, tokens_used = self.model.generate(rewritten)
+            _, rewritten_context = self.model.generate(rewritten)
+            sharded_prompt.pop()  # Remove last user message
+            sharded_prompt.append({"role": "user", "content": rewritten_context}) # Add rewritten prompt
+            avg_entropy, response = self.model.generate(sharded_prompt)
 
         return avg_entropy, response, reset

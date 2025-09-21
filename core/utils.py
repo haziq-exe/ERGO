@@ -26,14 +26,16 @@ class Logger:
 
         self.logs = []
 
-    def log_entry(self, item_id, chat_history, entropy):
+    def log_entry(self, item_id, chat_history, final_output, entropy, resets):
         """
         Add a log entry to memory.
         """
         entry = {
             "item_id": item_id,
             "chat_history": chat_history,
-            "entropies": entropy
+            "final_output": final_output,
+            "entropies": entropy,
+            "resets": resets
         }
         self.logs.append(entry)
 

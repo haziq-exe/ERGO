@@ -28,7 +28,7 @@ class CodeEvaluator(Evaluator):
         for i in range(numruns):
             correct = []
             res = []
-            run_path = self.output_file + f"_run{i}.json"
+            run_path = self.output_file.replace(".json", f"_run{i}.json")
             with open(run_path, "r", encoding="utf-8") as f:
                 output = json.load(f)
 
@@ -166,7 +166,7 @@ class ActionsEvaluator(Evaluator):
         scores = []
 
         for i in range(numruns):
-            run_path = self.output_file + f"_run{i}.json"
+            run_path = self.output_file.replace(".json", f"_run{i}.json")
             with open(run_path, "r", encoding="utf-8") as f:
                 output = json.load(f)
 
@@ -248,7 +248,7 @@ class DatabaseEvaluator(Evaluator):
         avg = []
 
         for run_idx in range(numruns):
-            run_path = data_path + f"_run{run_idx}.json"
+            run_path = self.output_file.replace(".json", f"_run{run_idx}.json")
             with open(run_path, "r", encoding="utf-8") as f:
                 entries = json.load(f)
 
@@ -337,7 +337,7 @@ class DataToTextEvaluator(Evaluator):
         D2TEval = DataToTextEvalUtils()
         D2T = DataToText(self.dataset_path).load_data()
         for x in range(numruns):
-            run_path = self.output_file + f"_run{x}.json"
+            run_path = self.output_file.replace(".json", f"_run{x}.json")
             with open(run_path, "r", encoding="utf-8") as f:
                 output = json.load(f)
 

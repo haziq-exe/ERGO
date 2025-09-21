@@ -33,7 +33,7 @@ class RunERGO():
                 messages = [self.dataset.get_base_system(i)]
                 entropies = []
                 prev_entropy = float("inf")
-                resets = 0
+                resets = []
 
                 for shard in item["shards"]:
                     user_content = shard['shard']
@@ -49,10 +49,12 @@ class RunERGO():
                     prev_entropy = entropy
                     entropies.append(entropy)
                     if reset:
-                        resets += 1
+                        resets.append(1)
+                    else:
+                        resets.append(0)
                     
                     if shard['shard_id'] == len(item["shards"]):
-                        self.logger.log_entry(i, messages, entropies)
+                        self.logger.log_entry(i, messages, new_message, entropies, resets)
                         self.logger.save(x)
                 
             
