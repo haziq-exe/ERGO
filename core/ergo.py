@@ -2,15 +2,17 @@
 from typing import List, Dict
 from .model import BaseModel
 from .dataset import Dataset
+from prompts import GSM8K_prompt, Code_prompt, D2T_prompt, DB_prompt
 
 
 class Ergo:
     
     def __init__(self, model: BaseModel, threshold):
         """
-        ERGO orchestrates entropy checking and prompt rewriting.
-        :param model: Any BaseModel (OpenAIModel, LocalModel)
-        :param threshold: Entropy threshold to trigger rewriting.
+        Initialize ERGO with a model and entropy threshold.
+        model: Any BaseModel (OpenAIModel, LocalModel)
+        threshold: Threshold 𝚫Entropy must exceed to trigger rewriting.
+        rewrite_prompts: Dataset specific few-shot prompts for rewriting.
         """
 
         self.model = model
@@ -18,20 +20,19 @@ class Ergo:
 
         
         self.rewrite_prompts = {
-            "GSM8K": [],
-            "Database": [],
-            "Code": [],
-            "Actions": [],
-            "DataToText": []
+            "GSM8K": [GSM8K_prompt],
+            "Database": [DB_prompt],
+            "Code": [Code_prompt],
+            "Actions": [GSM8K_prompt], # We reused GSM8K prompt for Actions
+            "DataToText": [D2T_prompt]
         }
 
-    def rewrite_prompt(self, prompt: List[Dict[str, str]], dataset: Dataset):
+    def rewrite_prompt(self, prompt, dataset: Dataset):
         """
-        Rewrites all user messages into a single consolidated input.
+        Rewrites all prior user messages into a single consolidated input.
         Keeps system/few-shot context from dataset-specific templates.
-        :param prompt: List of {role, content} messages.
-        :param dataset: Dataset to select rewrite few-shot prompt.
-        :return: A new prompt list ready for the model.
+
+        returns: Prompt for model to rewrite along with few-shot examples.
         """
 
         
@@ -57,12 +58,12 @@ class Ergo:
 
         return new_prompt
 
-    def run(self, sharded_prompt: List[Dict[str, str]], dataset: Dataset, prev_entropy : float):
+    def run(self, sharded_prompt, dataset: Dataset, prev_entropy):
         """
-        Run ERGO on a sharded prompt:
+        Run ERGO on a prompt:
         - Generate response
         - Check entropy
-        - If above threshold, rewrite prompt and regenerate
+        - If above threshold, rewrite prompt, start new context with just rewritten prompt and regenerate
         """
         avg_entropy, response = self.model.generate(sharded_prompt)
         reset = False
@@ -71,8 +72,10 @@ class Ergo:
             reset = True
             rewritten = self.rewrite_prompt(sharded_prompt, dataset)
             _, rewritten_context = self.model.generate(rewritten)
-            sharded_prompt.pop()  # Remove last user message
-            sharded_prompt.append({"role": "user", "content": rewritten_context}) # Add rewritten prompt
+
+            sharded_prompt = [msg for msg in sharded_prompt if msg["role"] == "system"]
+
+            sharded_prompt.append({"role": "user", "content": rewritten_context})
             avg_entropy, response = self.model.generate(sharded_prompt)
 
         return avg_entropy, response, reset

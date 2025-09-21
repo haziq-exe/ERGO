@@ -10,21 +10,20 @@ import torch
 # Need to remove api_key from here, is passed as an environment variable.
 
 class BaseModel:
-    def __init__(self, model_name: str, api_key: str = None):
+    def __init__(self, model_name, api_key):
+        """
+        Base class for language models. Either local huggingface model or OpenAI API.
+        if model_name uses "gpt" it uses OpenAI API.
+        To do: 
+        - Remove api key from here, is passed as an environment variable.
+        """
         self.model_name = model_name
         self.api_key = api_key
 
-    def generate(self, prompt: List[Dict[str, str]]) -> str:
-        """
-        Generate output based on the given prompt.
-        `prompt` is expected to be a list of dicts with 'role' and 'content'.
-        """
+    def generate(self, prompt):
         raise NotImplementedError
 
     def compute_entropy(self, output: Any) -> float:
-        """
-        Compute the average token-level entropy of the model's output.
-        """
         raise NotImplementedError
     
 
@@ -32,13 +31,16 @@ class LocalLLMModel(BaseModel):
 
     def __init__(self, model_name, device, max_new_tokens, dtype=torch.float16, temperature=1.0, do_sample=True, device_map="auto"):
         super().__init__(model_name)
+
         self.tokenizer = AutoTokenizer.from_pretrained(model_name,  trust_remote_code=True)
+
         self.model = AutoModelForCausalLM.from_pretrained(
             model_name,
             dtype=dtype,
             device_map=device_map,
              trust_remote_code=True
         ).to(device)
+
         self.device = device
         self.temperature = temperature
         self.max_new_tokens = max_new_tokens
@@ -47,13 +49,13 @@ class LocalLLMModel(BaseModel):
     def generate(self, messages):
         """
         Generate text using a local Hugging Face model.
-        Returns: (avg_entropy, generated_text, tokens_used)
+        Returns: (avg_entropy, generated_text)
         """
 
         prompt = self.tokenizer.apply_chat_template(
             messages,
             tokenize=False,
-            add_generation_prompt=True  # ensures assistant tag is included
+            add_generation_prompt=True
         )
 
         inputs = self.tokenizer(prompt, return_tensors="pt", truncation=True).to(self.device)
@@ -84,11 +86,7 @@ class LocalLLMModel(BaseModel):
 
         return avg_entropy, response_only # tokens_used 
 
-    def compute_entropy(self, probs: torch.Tensor) -> float:
-        """
-        Compute Shannon entropy across generated tokens.
-        probs: Tensor of shape [new_tokens, batch, vocab]
-        """
+    def compute_entropy(self, probs):
         entropy = -torch.sum(probs * torch.log(probs + 1e-8), dim=-1)
         avg_entropy = entropy.mean().item()
         return avg_entropy
@@ -106,8 +104,9 @@ class OpenAIModel(BaseModel):
     def generate(self, prompt: List[Dict[str, str]]):
         """
         Sends a prompt to OpenAI Chat API and returns:
-        (average_entropy, generated_text, tokens_used)
+        (average_entropy, generated_text)
         """
+
         resp = self.client.chat.completions.create(
             model=self.model_name,
             messages=prompt,
@@ -125,10 +124,7 @@ class OpenAIModel(BaseModel):
 
         return avg_entropy, generated_text#, tokens_used
 
-    def compute_entropy(self, token_logprobs: List[Dict[str, Any]]) -> float:
-        """
-        Compute average Shannon entropy across tokens using top_logprobs info.
-        """
+    def compute_entropy(self, token_logprobs):
         entropies = []
         for token_info in token_logprobs:
             entropy = 0.0

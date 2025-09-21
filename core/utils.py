@@ -6,14 +6,10 @@ from .dataset import Dataset
 
 
 class Logger:
-    def __init__(self, model: BaseModel = None, dataset: Dataset = None, output_path: str = None):
+    def __init__(self, model: BaseModel, dataset: Dataset, output_path):
         """
         Logger for saving model responses and entropy values to a JSON file.
-
-        Args:
-            model: instance of BaseModel (has model_name)
-            dataset: instance of ShardedDataset (has dataset_name)
-            output_path: optional, custom output file path. If None, defaults to ModelName_DatasetName.json
+        If output_path = None, defaults to ModelName_DatasetName.json
         """
 
         self.model_name = model.model_name
@@ -28,7 +24,12 @@ class Logger:
 
     def log_entry(self, item_id, chat_history, final_output, entropy, resets):
         """
-        Add a log entry to memory.
+        Log a single entry consisting of:
+        - item_id: unique identifier for the data item
+        - chat_history: list of (user_message, model_response) tuples
+        - final_output: final response from the model
+        - entropy: list of entropy values for each model response
+        - resets: array 0 and 1 indicating which shard reset was triggered
         """
         entry = {
             "item_id": item_id,
