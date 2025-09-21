@@ -4,6 +4,11 @@ import json
 
 class Dataset():
     def __init__(self, dataset_name, dataset_path):
+        """
+        Initialize instances of Datasets. 
+        Each dataset has its own base system prompt and final shard instruction.
+        """
+
         self.dataset_name = dataset_name
         self.dataset_path = dataset_path
         self.data = []

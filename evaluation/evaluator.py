@@ -9,7 +9,11 @@ import os
 class Evaluator:
     def __init__(self, output_file, dataset_path):
         """
-        Initialize the Evaluator with an output file path.
+        Initialize the Evaluator with an output file path to save eval to.
+        Adds a "correct" boolean field to each entry in the output file 
+        (float "score" for DataToText dataset)
+
+        To do: Fix the mess that is the code of its subclasses.
         """
         self.output_file = output_file
         self.dataset_path = dataset_path
@@ -81,7 +85,7 @@ class CodeEvaluator(Evaluator):
         scores = []
         for i, corr in enumerate(finalcorr):
             score = np.sum(corr) / numQ
-            print(f"Run {i} Score: {score}")
+            # print(f"Run {i} Score: {score}")
             scores.append(score)
 
         Average = {sums / len(finalcorr)}
@@ -144,7 +148,7 @@ class GSM8KEvaluator(Evaluator):
         scores = []
         for i, run_corr in enumerate(all_runs):
             score = np.sum(run_corr) / numQ
-            print(f"Run {i} Score: {score}")
+            # print(f"Run {i} Score: {score}")
             scores.append(score)
 
         if all_runs:
@@ -177,17 +181,16 @@ class ActionsEvaluator(Evaluator):
                 sample = dataset[x]
                 raw_model_output = output[x].get('final_output', "") or ""
 
-                # If the model wrapped an <Answer> tag, extract its content
                 model_answers = re.findall(r'<Answer>\s*(.*?)(?:</Answer>|$)', raw_model_output, flags=re.DOTALL)
                 if model_answers:
                     raw_model_output = model_answers[0]
 
-                # Try to extract, clean and evaluate the predicted function/block
+
                 mod_ans = utils.extract_function_block(raw_model_output)
                 mod_ans = utils.clean_function_block(mod_ans)
                 corr = utils.evaluator_function(predicted_answer=mod_ans, sample=sample)
 
-                # If parsing failed, try wrapping in brackets and retry
+
                 if "Failing to parse the predicted answer as an AST" in (corr.get("error") or ""):
                     mod_ans = utils.extract_function_block(f"[{raw_model_output}]")
                     mod_ans = utils.clean_function_block(mod_ans)
@@ -198,7 +201,6 @@ class ActionsEvaluator(Evaluator):
                     correct_count += 1
                     is_correct = True
                 else:
-                    # If there were no resets, prefer checking assistant messages individually
                     if output[x].get('resets', 0) == 0:
                         for entry in output[x].get('chat_history', []):
                             if entry.get("role") == "assistant":
@@ -211,7 +213,6 @@ class ActionsEvaluator(Evaluator):
                             if is_correct:
                                 break
                     else:
-                    # If there were resets, scan all function blocks in the chat history at once
                         for block in utils.extract_all_function_blocks(output[x].get('chat_history', [])):
                             corr = utils.evaluator_function(predicted_answer=block, sample=sample)
                             if corr.get("is_correct"):
@@ -222,7 +223,6 @@ class ActionsEvaluator(Evaluator):
                 output[x]['correct'] = bool(is_correct)
                 run_results.append(1 if is_correct else 0)
 
-            # Save corrected run output
             corrected_path = self.output_file + f"_run{i}_CORRECTED.json"
             with open(corrected_path, "w", encoding="utf-8") as f_out:
                 json.dump(output, f_out, indent=2)
@@ -263,14 +263,12 @@ class DatabaseEvaluator(Evaluator):
             try:
                 ref_res = utils.run_query(db_path, ref_sql)
             except Exception:
-                # If reference query fails, treat as mismatch for safety
                 entries[e]['correct'] = False
                 res.append(entries[e].get('resets', 0))
                 continue
 
             matched = False
 
-            # Check final_output first
             for llm_sql in utils.extract_sql_queries(entries[e].get('final_output', "")):
                 try:
                     llm_res = utils.run_query(db_path, llm_sql)
@@ -280,10 +278,9 @@ class DatabaseEvaluator(Evaluator):
                     matched = True
                     break
 
-            # If not matched, inspect chat history depending on resets
+
             if not matched:
                 if entries[e].get("resets", 0) == 0:
-                # Check assistant messages individually
                     for msg in entries[e].get('chat_history', []):
                         if msg.get("role") != "assistant":
                             continue
@@ -298,7 +295,6 @@ class DatabaseEvaluator(Evaluator):
                     if matched:
                         break
                 else:
-                # If there were resets, scan all SQLs found in the whole chat_history
                     for llm_sql in utils.extract_sql_queries(entries[e].get('chat_history', [])):
                         try:
                             llm_res = utils.run_query(db_path, llm_sql)
@@ -318,14 +314,14 @@ class DatabaseEvaluator(Evaluator):
 
             accuracy = correct / numQ if numQ else 0.0
             avg.append(accuracy)
-            print(f"Accuracy = {accuracy}")
+            # print(f"Accuracy = {accuracy}")
 
             corrected_path = data_path + f"_run{run_idx}_CORRECTED.json"
             with open(corrected_path, "w", encoding="utf-8") as f_out:
                 json.dump(entries, f_out, indent=2)
 
         overall = float(np.mean(avg)) if avg else 0.0
-        print(f"Average = {overall}")
+        # print(f"Average = {overall}")
         return avg, overall
     
 class DataToTextEvaluator(Evaluator):
