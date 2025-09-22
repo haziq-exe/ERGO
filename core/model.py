@@ -7,18 +7,14 @@ from transformers import AutoTokenizer, AutoModelForCausalLM, logging
 import torch
 
 # logging.set_verbosity_info()
-# Need to remove api_key from here, is passed as an environment variable.
 
 class BaseModel:
-    def __init__(self, model_name, api_key):
+    def __init__(self, model_name):
         """
         Base class for language models. Either local huggingface model or OpenAI API.
         if model_name uses "gpt" it uses OpenAI API.
-        To do: 
-        - Remove api key from here, is passed as an environment variable.
         """
         self.model_name = model_name
-        self.api_key = api_key
 
     def generate(self, prompt):
         raise NotImplementedError

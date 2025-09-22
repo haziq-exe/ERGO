@@ -14,11 +14,7 @@ class Logger:
 
         self.model_name = model.model_name
         self.dataset_name = dataset.dataset_name
-
-        if output_path is None and self.model_name and self.dataset_name:
-            self.output_file = f"{self.model_name}_{self.dataset_name}.json"
-        else:
-            self.output_file = output_path
+        self.output_file = output_path
 
         self.logs = []
 

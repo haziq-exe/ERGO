@@ -20,7 +20,7 @@ class Evaluator:
     def evaluate(self):
         raise NotImplementedError
     
-    def identifier():
+    def identifier(self):
         raise NotImplementedError
         
 
@@ -44,7 +44,7 @@ class CodeEvaluator(Evaluator):
         else:
             return {"score": 0.0, "error": "No function found in model output."}
 
-    def identifier():
+    def identifier(self):
         return "Code"
 
 class GSM8KEvaluator(Evaluator):
@@ -87,7 +87,7 @@ class GSM8KEvaluator(Evaluator):
         score = 1.0 if extracted_answer == gold else 0.0
         return {"score": score, "error": None}
     
-    def identifier():
+    def identifier(self):
         return "GSM8K"
     
 class ActionsEvaluator(Evaluator):
@@ -111,7 +111,7 @@ class ActionsEvaluator(Evaluator):
         else:
             return {"score": 0.0, "error": corr.get("error")}
 
-    def identifier():
+    def identifier(self):
         return "GSM8K"
     
 class DatabaseEvaluator(Evaluator):
@@ -143,7 +143,7 @@ class DatabaseEvaluator(Evaluator):
         return {"score": 1.0, "error": None}
     
 
-    def identifier():
+    def identifier(self):
         return "Database"
     
 class DataToTextEvaluator(Evaluator):
@@ -158,5 +158,5 @@ class DataToTextEvaluator(Evaluator):
         
         return {"score": score, "error": None}
     
-    def identifier():
+    def identifier(self):
         return "DataToText"

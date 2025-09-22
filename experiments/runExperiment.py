@@ -3,6 +3,7 @@ from core.dataset import GSM8K, Database, Code, Actions, DataToText
 from core.ergo import Ergo
 from core.utils import Logger
 from generation.generator import RunERGO
+from evaluation.evaluator import GSM8KEvaluator, DatabaseEvaluator, ActionsEvaluator, CodeEvaluator, DataToTextEvaluator
 
 class RunExperiment():
     def __init__(self, model_name, api_key = None, device="cuda", device_map="auto", max_new_tokens=1024, dtype="float16", temperature=1.0, do_sample=True, openai=False):
@@ -26,37 +27,42 @@ class RunExperiment():
             )
             self.tokenizer = self.model.tokenizer
 
-    def run_GSM8K(self, dataset_path, num_Qs = None, threshold=0.5, output_path=None, num_runs=1):
+    def run_GSM8K(self, dataset_path, output_path, num_Qs = None, threshold=0.5, num_runs=1):
         dataset = GSM8K(dataset_path=dataset_path)
         ergo = Ergo(model=self.model, threshold=threshold)
         logger = Logger(model=self.model, dataset=dataset, output_path=output_path)
-        runner = RunERGO(model=self.model, dataset=dataset, ergo=ergo, logger=logger, num_Qs=num_Qs, num_runs=num_runs)
+        evaluator = GSM8KEvaluator(output_file=output_path, dataset_path=dataset_path)
+        runner = RunERGO(model=self.model, dataset=dataset, ergo=ergo, logger=logger, evaluator=evaluator, num_Qs=num_Qs, num_runs=num_runs)
         runner.execute()
 
     def run_Database(self, dataset_path, spider_DB_path, num_Qs = None, threshold=0.5, output_path=None, num_runs=1):
         dataset = Database(dataset_path=dataset_path)
         ergo = Ergo(model=self.model, threshold=threshold)
         logger = Logger(model=self.model, dataset=dataset, output_path=output_path)
-        runner = RunERGO(model=self.model, dataset=dataset, ergo=ergo, logger=logger, num_Qs=num_Qs, num_runs=num_runs)
+        evaluator = DatabaseEvaluator(output_file=output_path, dataset_path=dataset_path)
+        runner = RunERGO(model=self.model, dataset=dataset, ergo=ergo, logger=logger, evaluator=evaluator, num_Qs=num_Qs, num_runs=num_runs)
         runner.execute(spider_DB_path=spider_DB_path)
 
     def run_Code(self, dataset_path, num_Qs = None, threshold=0.5, output_path=None, num_runs=1):
         dataset = Code(dataset_path=dataset_path)
         ergo = Ergo(model=self.model, threshold=threshold)
         logger = Logger(model=self.model, dataset=dataset, output_path=output_path)
-        runner = RunERGO(model=self.model, dataset=dataset, ergo=ergo, logger=logger, num_Qs=num_Qs, num_runs=num_runs)
+        evaluator = CodeEvaluator(output_file=output_path, dataset_path=dataset_path)
+        runner = RunERGO(model=self.model, dataset=dataset, ergo=ergo, logger=logger, evaluator=evaluator, num_Qs=num_Qs, num_runs=num_runs)
         runner.execute()
 
     def run_Actions(self, dataset_path, num_Qs = None, threshold=0.5, output_path=None, num_runs=1):
         dataset = Actions(dataset_path=dataset_path)
         ergo = Ergo(model=self.model, threshold=threshold)
         logger = Logger(model=self.model, dataset=dataset, output_path=output_path)
-        runner = RunERGO(model=self.model, dataset=dataset, ergo=ergo, logger=logger, num_Qs=num_Qs, num_runs=num_runs)
+        evaluator = ActionsEvaluator(output_file=output_path, dataset_path=dataset_path)
+        runner = RunERGO(model=self.model, dataset=dataset, ergo=ergo, logger=logger, evaluator=evaluator, num_Qs=num_Qs, num_runs=num_runs)
         runner.execute()
 
     def run_DataToText(self, dataset_path, num_Qs = None, threshold=0.5, output_path=None, num_runs=1):
         dataset = DataToText(dataset_path=dataset_path)
         ergo = Ergo(model=self.model, threshold=threshold)
         logger = Logger(model=self.model, dataset=dataset, output_path=output_path)
-        runner = RunERGO(model=self.model, dataset=dataset, ergo=ergo, logger=logger, num_Qs=num_Qs, num_runs=num_runs)
+        evaluator = DataToTextEvaluator(output_file=output_path, dataset_path=dataset_path)
+        runner = RunERGO(model=self.model, dataset=dataset, ergo=ergo, logger=logger, evaluator=evaluator, num_Qs=num_Qs, num_runs=num_runs)
         runner.execute()
