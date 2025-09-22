@@ -59,7 +59,6 @@ pip install -r requirements.txt
 
 ```python
 from experiments.runExperiment import RunExperiment
-from experiments.runEvaluation import RunEvaluation
 
 # Initialize experiment with your chosen model
 experiment = RunExperiment(
