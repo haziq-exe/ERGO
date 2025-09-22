@@ -77,14 +77,6 @@ experiment.run_GSM8K(
     threshold=0.5,
     output_path="outputs/gsm8k_example.json"
 )
-
-# Evaluate results
-evaluation = RunEvaluation(dataset_path="sharded_dataset.json")
-evaluation.GSM8K_evaluate(
-    numQ=20,
-    num_runs=1,
-    input_path="outputs/gsm8k_example.json"
-)
 ```
 
 Run from root directory:
@@ -106,8 +98,7 @@ ERGO/
 │   ├── model.py          
 │   └── utils.py          
 │
-├── experiments/        # Experiment runners
-│   ├── runEvaluation.py 
+├── experiments/        # Experiment runner
 │   └── runExperiment.py  
 │
 ├── generation/         # Generate with ERGO
@@ -165,7 +156,7 @@ If you use ERGO in your research, please cite our paper:
   title={ERGO: Entropy-guided Resetting for Generation Optimization in Multi-turn Language Models},
   author={Khalid, Haziq Mohammad and Jeyaganthan, Athikash and Do, Timothy and 
           Fu, Yicheng and O'Brien, Sean and Sharma, Vasu and Zhu, Kevin},
-  booktitle={Proceedings of the Conference on Uncertainty in Natural Language Processing (UncertaiNLP)},
+  booktitle={Proceedings of the 2nd Workshop on Uncertainty-Aware NLP (UncertaiNLP 2025)}
   year={2025}
 }
 ```

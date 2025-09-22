@@ -33,12 +33,12 @@ class RunExperiment():
         runner = RunERGO(model=self.model, dataset=dataset, ergo=ergo, logger=logger, num_Qs=num_Qs, num_runs=num_runs)
         runner.execute()
 
-    def run_Database(self, dataset_path, num_Qs = None, threshold=0.5, output_path=None, num_runs=1):
+    def run_Database(self, dataset_path, spider_DB_path, num_Qs = None, threshold=0.5, output_path=None, num_runs=1):
         dataset = Database(dataset_path=dataset_path)
         ergo = Ergo(model=self.model, threshold=threshold)
         logger = Logger(model=self.model, dataset=dataset, output_path=output_path)
         runner = RunERGO(model=self.model, dataset=dataset, ergo=ergo, logger=logger, num_Qs=num_Qs, num_runs=num_runs)
-        runner.execute()
+        runner.execute(spider_DB_path=spider_DB_path)
 
     def run_Code(self, dataset_path, num_Qs = None, threshold=0.5, output_path=None, num_runs=1):
         dataset = Code(dataset_path=dataset_path)

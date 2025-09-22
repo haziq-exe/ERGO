@@ -2,10 +2,11 @@ from core.model import BaseModel
 from core.dataset import Dataset  
 from core.ergo import Ergo
 from core.utils import Logger
+from evaluation.evaluator import GSM8KEvaluator, ActionsEvaluator, CodeEvaluator, DatabaseEvaluator, DataToTextEvaluator, Evaluator
 import random
 
 class RunERGO():
-    def __init__(self, model: BaseModel, dataset: Dataset, ergo: Ergo, logger: Logger, num_Qs : int, num_runs : int = 1):
+    def __init__(self, model: BaseModel, dataset: Dataset, evaluator: Evaluator,  ergo: Ergo, logger: Logger, num_Qs : int, num_runs : int = 1):
         """
         Executes the ERGO process on a given dataset and model, logging results.
         :param model: Instance of BaseModel (OpenAIModel, LocalModel)
@@ -20,13 +21,14 @@ class RunERGO():
         self.ergo = ergo
         self.logger = logger
         self.num_runs = num_runs
+        self.evaluator = evaluator
 
         if not num_Qs:
             self.num_Qs = len(dataset)
         else:
             self.num_Qs = num_Qs
 
-    def execute(self):
+    def execute(self, spider_DB_path=None):
         for x in range(self.num_runs):
             for i in range(self.num_Qs):
                 item = self.dataset.data[i]
@@ -52,9 +54,19 @@ class RunERGO():
                         resets.append(1)
                     else:
                         resets.append(0)
-                    
-                    if shard['shard_id'] == len(item["shards"]):
-                        self.logger.log_entry(i, messages, new_message, entropies, resets)
+
+                    if self.evaluator.identifier() == "Database":
+                        result = self.evaluator.evaluate(dataset=self.dataset, extracted_answer=new_message, spider_DB_path=spider_DB_path, question_id=i)
+                    elif self.evaluator.identifier() == "DataToText":
+                        continue
+                    else:
+                        result = self.evaluator.evaluate(dataset=self.dataset, extracted_answer=new_message, question_id=i)
+
+                    if shard['shard_id'] == len(item["shards"]) or result["score"] == 1.0:
+                        if self.evaluator.identifier() == "DataToText":
+                            result = self.evaluator.evaluate(dataset=self.dataset, extracted_answer=new_message, question_id=i)
+
+                        self.logger.log_entry(i, messages, new_message, entropies, resets, result)
                         self.logger.save(x)
                 
             
