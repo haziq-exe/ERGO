@@ -6,17 +6,18 @@ class Dataset():
     def __init__(self, dataset_name, dataset_path):
         """
         Initialize instances of Datasets. 
-        Each dataset has its own base system prompt and final shard instruction.
+        Each dataset has its own base system prompt, some have extra final shard instructions.
         """
 
         self.dataset_name = dataset_name
         self.dataset_path = dataset_path
         self.data = []
         self.final_shard_instruct = ""
+        # For more realistic humanlike transition between shards:
         self.connectors = ["oh also, ", "I just remembered, ", "sorry i forgot to say, ", "", "oh, and ", "FYI, "]
 
     def get_base_system(self, i):
-        pass
+        raise NotImplementedError
 
     def __len__(self):
         return len(self.data)
@@ -25,14 +26,13 @@ class GSM8K(Dataset):
     def __init__(self, dataset_path):
         super().__init__("GSM8K", dataset_path)
         self.data = self.load_data()
-        self.final_shard_instruct = " Put your final answer between <Answer> tags."
+        self.final_shard_instruct = ""
     
     def get_base_system(self, i):
         return {
         "role": "system",
         "content": (
-            "You are a helpful math assistant. "
-            "Put your final answer between <Answer> tags."
+            "You are a helpful math assistant."
             )
         }
 
