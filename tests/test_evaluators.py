@@ -16,7 +16,7 @@ def test_load_tiny_model():
 
 
 def test_evaluators_pass():
-    sample_path = Path("sample_dataset/sample_dataset.json")
+    sample_path = Path("tests/sample_dataset/sample_dataset.json")
 
     # Actions task
     act_ds = Actions(sample_path)
