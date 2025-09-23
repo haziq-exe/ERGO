@@ -99,12 +99,12 @@ class ActionsEvaluator(Evaluator):
         sample = dataset.data[question_id]
         utils = ActionsEvalUtils()
 
-        # try:
-        mod_ans = utils.extract_function_block(extracted_answer)
-        mod_ans = utils.clean_function_block(mod_ans)
-        corr = utils.evaluator_function(predicted_answer=mod_ans, sample=sample)
-        # except:
-        #     return {"score": 0.0, "error": "Exception during evaluation"}
+        try:
+            mod_ans = utils.extract_function_block(extracted_answer)
+            mod_ans = utils.clean_function_block(mod_ans)
+            corr = utils.evaluator_function(predicted_answer=mod_ans, sample=sample)
+        except:
+            return {"score": 0.0, "error": "Exception during evaluation"}
 
         if corr.get("is_correct"):
             return {"score": 1.0, "error": None}

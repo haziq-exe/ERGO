@@ -82,10 +82,10 @@ class ActionsEvalUtils(EvalUtils):
         Evaluate if the predicted function call matches the expected format and functionality.
         """
 
-        # try:
-        decoded_output = ast_parse(predicted_answer.strip(), sample["language"])
-        # except Exception as e:
-        #     return {"is_correct": False, "error": "Failing to parse the predicted answer as an AST"}
+        try:
+            decoded_output = ast_parse(predicted_answer.strip(), sample["language"])
+        except Exception as e:
+            return {"is_correct": False, "error": "Failing to parse the predicted answer as an AST"}
 
         result = ast_checker(
             sample["function"],
