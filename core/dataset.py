@@ -17,6 +17,9 @@ class Dataset():
         self.connectors = ["oh also, ", "I just remembered, ", "sorry i forgot to say, ", "", "oh, and ", "FYI, "]
 
     def get_base_system(self, i):
+        """
+        Returns the base system prompt for the dataset.
+        """
         raise NotImplementedError
 
     def __len__(self):

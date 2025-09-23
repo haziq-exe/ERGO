@@ -12,7 +12,7 @@ class Ergo:
         Initialize ERGO with a model and entropy threshold.
         model: Any BaseModel (OpenAIModel, LocalModel)
         threshold: Threshold 𝚫Entropy must exceed to trigger rewriting.
-        rewrite_prompts: Dataset specific few-shot prompts for rewriting.
+        rewrite_prompts: Dataset specific few-shot prompts for rewriting. (retrieved from prompts.py)
         """
 
         self.model = model

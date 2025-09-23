@@ -10,15 +10,22 @@ class Evaluator:
     def __init__(self, output_file=None, dataset_path=None):
         """
         Initialize the Evaluator with an output file path to save eval to.
-        Adds a "score" to each entry in the output file 
+        Adds a "score" to each entry in the output file.
         """
         self.output_file = output_file
         self.dataset_path = dataset_path
     
     def evaluate(self):
+        """
+        Evaluate the extracted answer against the ground truth.
+        Returns: {"score": float, "error": str or None}
+        """
         raise NotImplementedError
     
     def identifier(self):
+        """
+        Returns a string identifier for the evaluator.
+        """
         raise NotImplementedError
         
 

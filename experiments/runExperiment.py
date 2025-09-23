@@ -6,9 +6,13 @@ from generation.generator import RunERGO
 from evaluation.evaluator import GSM8KEvaluator, DatabaseEvaluator, ActionsEvaluator, CodeEvaluator, DataToTextEvaluator
 
 class RunExperiment():
+    """
+    Initialize an experiment with a model (local or OpenAI) and run on a specified dataset.
+    """
+
     def __init__(self, model_name, device="cuda", device_map="auto", max_new_tokens=1024, dtype="float16", temperature=1.0, do_sample=True, openai=False):
         self.model_name = model_name
-        if 'gpt' in model_name or openai:
+        if openai:
             self.model = OpenAIModel(
                 model_name=model_name,
                 temperature=temperature,

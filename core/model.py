@@ -13,14 +13,22 @@ class BaseModel:
     def __init__(self, model_name):
         """
         Base class for language models. Either local huggingface model or OpenAI API.
-        if model_name uses "gpt" it uses OpenAI API.
+        if openai=True it uses OpenAI API.
         """
         self.model_name = model_name
 
     def generate(self, prompt):
+        """
+        Generate text using a local Hugging Face model or OpenAI API.
+        Returns: (avg_entropy, generated_text)
+        """
         raise NotImplementedError
 
     def compute_entropy(self, output: Any) -> float:
+        """
+        Compute the average token-level entropy of the generated text.
+        Returns: avg_entropy
+        """
         raise NotImplementedError
     
 

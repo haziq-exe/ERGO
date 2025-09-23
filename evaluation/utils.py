@@ -8,6 +8,10 @@ import sqlite3
 
 
 class EvalUtils:
+    """
+    Each class includes utility functions used to extract relevant parts of model output 
+    and/or to judge correctness.
+    """
     def __init__(self):
         pass
 
@@ -103,6 +107,10 @@ class DataToTextEvalUtils(EvalUtils):
         super().__init__()
 
     def D2T_evaluator_function(self, extracted_answer, sample):
+        """
+        Evaluates the extracted answer against the references using BLEU score.
+        Returns a score between 0 and 1.
+        """
         # ToTTo has multiple references per example
         references = sample["references"]
         bleu = sacrebleu.corpus_bleu([extracted_answer.strip()], [[ref.strip()] for ref in references])
@@ -114,6 +122,10 @@ class DatabaseEvalUtils(EvalUtils):
 
 
     def extract_sql_query(self, text):
+        """
+        Extract the first SQL query from a text blob.
+        Looks for fenced code blocks (```sql ... ```) first.
+        If none found, returns None."""
         # Match content inside ```sql ... ``` block
         match = re.search(r'```sql(.*?)```', text, re.DOTALL | re.IGNORECASE)
         if match:
@@ -150,6 +162,10 @@ class DatabaseEvalUtils(EvalUtils):
         return queries
 
     def run_query(self, db_path, sql):
+      """
+      Runs the given SQL query on the SQLite database at db_path.
+      Returns the query results as a list of tuples.
+    """
       conn = sqlite3.connect(db_path)
       # decode any bytes with replacement on errors
       conn.text_factory = lambda b: b.decode('utf-8', errors='replace')
@@ -275,6 +291,11 @@ class CodeEvalUtils(EvalUtils):
 
 
     def run_function_and_check(self, func_name, user_code, test_cases):
+        """
+        Runs the llm generated code against provided test cases.
+        Each test case is a dict with "input" (string of args, one per line)
+        and "output" (expected output).
+        """
         with tempfile.NamedTemporaryFile(suffix=".py", delete=False, mode="w") as f:
             user_code_path = f.name
             f.write("import math\n")
