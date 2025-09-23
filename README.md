@@ -140,12 +140,9 @@ ERGO has been rigorously tested across five diverse generation tasks:
 
 </div>
 
-## Important Notes
-
-> **Beta Status**: While the codebase is complete and functional, It is still in its early stages. You may encounter bugs, these are being worked on.
+## Note
 
 > **Documentation**: Comprehensive documentation is in development. For now, please refer to the paper for detailed methodology and theoretical foundations.
-
 
 ## Citation
 
