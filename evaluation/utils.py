@@ -82,11 +82,10 @@ class ActionsEvalUtils(EvalUtils):
         Evaluate if the predicted function call matches the expected format and functionality.
         """
 
-        try:
-            decoded_output = ast_parse(predicted_answer.strip(), sample["language"])
-        except Exception as e:
-            # print(f"\033[94mPredicted answer:{predicted_answer}\033[0m")
-            return {"is_correct": False, "error": "Failing to parse the predicted answer as an AST"}
+        # try:
+        decoded_output = ast_parse(predicted_answer.strip(), sample["language"])
+        # except Exception as e:
+        #     return {"is_correct": False, "error": "Failing to parse the predicted answer as an AST"}
 
         result = ast_checker(
             sample["function"],
@@ -150,7 +149,7 @@ class DatabaseEvalUtils(EvalUtils):
         #   queries.append(text)
         return queries
 
-    def run_query(db_path, sql):
+    def run_query(self, db_path, sql):
       conn = sqlite3.connect(db_path)
       # decode any bytes with replacement on errors
       conn.text_factory = lambda b: b.decode('utf-8', errors='replace')
@@ -275,49 +274,61 @@ class CodeEvalUtils(EvalUtils):
         return "\n".join(import_lines + [""] + collected).rstrip(), func_name
 
 
-    def run_function_and_check(func_name, user_code, test_cases):
+    def run_function_and_check(self, func_name, user_code, test_cases):
         with tempfile.NamedTemporaryFile(suffix=".py", delete=False, mode="w") as f:
             user_code_path = f.name
             f.write("import math\n")
             f.write(user_code)
 
-        # print(user_code)
         runner_code = f"""
-    import json
-    import sys
-    import ast
-    import math
-    import importlib.util
+import json
+import sys
+import ast
+import math
+import importlib.util
 
-    spec = importlib.util.spec_from_file_location("tempmod", "{user_code_path}")
-    tempmod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(tempmod)
+spec = importlib.util.spec_from_file_location("tempmod", "{user_code_path}")
+tempmod = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(tempmod)
 
-    failures = []
-    def parse_argument(line):
-        line = line.strip()
-        if line.startswith('"') and line.endswith('"'):
-            return line[1:-1]  # Strip outer double quotes, treat as string
-        try:
-            return ast.literal_eval(line)
-        except:
-            return line  # fallback
+failures = []
+def parse_argument(line):
+    line = line.strip()
+    if line.startswith('"') and line.endswith('"'):
+        return line[1:-1]  # Strip outer double quotes, treat as string
+    try:
+        return ast.literal_eval(line)
+    except:
+        return line  # fallback
 
-    for idx, case in enumerate({test_cases}):
-        input_lines = case["input"].splitlines()
-        args = [parse_argument(line) for line in input_lines]
+for idx, case in enumerate({test_cases}):
+    input_lines = case["input"].splitlines()
+    args = [parse_argument(line) for line in input_lines]
 
-        try:
-            expected = ast.literal_eval(case["output"])
-        except:
-            expected = case["output"]
+    try:
+        expected = ast.literal_eval(case["output"])
+    except:
+        expected = case["output"]
 
-        if expected == "true" or expected == "Yes" or expected == "yes":
-            expected = True
+    if expected == "true" or expected == "Yes" or expected == "yes":
+        expected = True
 
-        if expected == "false" or expected == "No" or expected == "no":
-            expected = False
+    if expected == "false" or expected == "No" or expected == "no":
+        expected = False
 
+    try:
+        got = getattr(tempmod, "{func_name}")(*args)
+    except Exception as e:
+        failures.append(f"{{args}} raised {{e!r}}")
+        continue
+
+    if got == "Yes" or got == "yes":
+        got = True
+    if got == "No" or got == "no":
+        got = False
+
+    if got and got != expected:
+        args = args.reverse()
         try:
             got = getattr(tempmod, "{func_name}")(*args)
         except Exception as e:
@@ -325,32 +336,18 @@ class CodeEvalUtils(EvalUtils):
             continue
 
         if got == "Yes" or got == "yes":
-        got = True
-        if got == "No" or got == "no":
-        got = False
-
-        if got and got != expected:
-            args = args.reverse()
-            try:
-            got = getattr(tempmod, "{func_name}")(*args)
-            except Exception as e:
-            failures.append(f"{{args}} raised {{e!r}}")
-            continue
-
-            if got == "Yes" or got == "yes":
             got = True
-            if got == "No" or got == "no":
+        if got == "No" or got == "no":
             got = False
 
-            if got != expected:
+        if got != expected:
             failures.append(f"Test {{idx}} :- {{args}}: got={{got!r}}, expected={{expected!r}}")
 
-    if failures:
-        print(json.dumps({{"ok": False, "errors": failures}}))
-        sys.exit(1)
-    else:
-        print(json.dumps({{"ok": True}}))
-        sys.exit(0)
+if failures:
+    print(failures)
+    sys.exit(failures)
+else:
+    sys.exit(0)
     """
 
         with tempfile.NamedTemporaryFile(suffix=".py", delete=False, mode="w") as f:
@@ -365,7 +362,6 @@ class CodeEvalUtils(EvalUtils):
                 timeout=3
             )
         except:
-            print("TIMEOUT ERROR")
             return False
 
         if result.returncode == 0:
