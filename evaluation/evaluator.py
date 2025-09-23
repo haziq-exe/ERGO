@@ -7,12 +7,10 @@ import re
 import os
 
 class Evaluator:
-    def __init__(self, output_file, dataset_path):
+    def __init__(self, output_file=None, dataset_path=None):
         """
         Initialize the Evaluator with an output file path to save eval to.
         Adds a "score" to each entry in the output file 
-
-        To do: Fix the mess that is this code.
         """
         self.output_file = output_file
         self.dataset_path = dataset_path
@@ -27,16 +25,18 @@ class Evaluator:
         
 class CodeEvaluator(Evaluator):
 
-    def __init__(self, output_file, dataset_path):
+    def __init__(self, output_file=None, dataset_path=None):
         super().__init__(output_file, dataset_path)
 
     def evaluate(self, dataset: Dataset, extracted_answer, question_id):
         sample = dataset.data[question_id]
         utils = CodeEvalUtils()
         function, func_name = utils.extract_first_function_block_and_name(extracted_answer)
+
         test_cases = ast.literal_eval(sample["public_test_cases"])
+
         if function and func_name:
-            passed = utils.run_function_and_check(func_name, function, test_cases)
+            passed = utils.run_function_and_check(func_name=func_name, user_code=function, test_cases=test_cases)
             if passed:
                 return {"score": 1.0, "error": None}
             else:
@@ -49,7 +49,7 @@ class CodeEvaluator(Evaluator):
 
 class GSM8KEvaluator(Evaluator):
 
-    def __init__(self, output_file, dataset_path):
+    def __init__(self, output_file=None, dataset_path=None):
         super().__init__(output_file, dataset_path)
     
     def evaluate(self, dataset: Dataset, extracted_answer, question_id):
@@ -92,19 +92,19 @@ class GSM8KEvaluator(Evaluator):
     
 class ActionsEvaluator(Evaluator):
 
-    def __init__(self, output_file, dataset_path):
+    def __init__(self, output_file=None, dataset_path=None):
         super().__init__(output_file, dataset_path)
 
     def evaluate(self, dataset: Dataset, extracted_answer, question_id):
         sample = dataset.data[question_id]
         utils = ActionsEvalUtils()
 
-        try :
-            mod_ans = utils.extract_function_block(extracted_answer)
-            mod_ans = utils.clean_function_block(mod_ans)
-            corr = utils.evaluator_function(predicted_answer=mod_ans, sample=sample)
-        except:
-            return {"score": 0.0, "error": "Exception during evaluation"}
+        # try:
+        mod_ans = utils.extract_function_block(extracted_answer)
+        mod_ans = utils.clean_function_block(mod_ans)
+        corr = utils.evaluator_function(predicted_answer=mod_ans, sample=sample)
+        # except:
+        #     return {"score": 0.0, "error": "Exception during evaluation"}
 
         if corr.get("is_correct"):
             return {"score": 1.0, "error": None}
@@ -115,7 +115,7 @@ class ActionsEvaluator(Evaluator):
         return "GSM8K"
     
 class DatabaseEvaluator(Evaluator):
-    def __init__(self, output_file, dataset_path):
+    def __init__(self, output_file=None, dataset_path=None):
         super().__init__(output_file, dataset_path)
     
 
@@ -147,7 +147,7 @@ class DatabaseEvaluator(Evaluator):
         return "Database"
     
 class DataToTextEvaluator(Evaluator):
-    def __init__(self, output_file, dataset_path):
+    def __init__(self, output_file=None, dataset_path=None):
         super().__init__(output_file, dataset_path)
 
     def evaluate(self, dataset: Dataset, extracted_answer, question_id):
@@ -156,7 +156,7 @@ class DataToTextEvaluator(Evaluator):
 
         score = D2TEval.D2T_evaluator_function(extracted_answer, reference_answer)
         
-        return {"score": score, "error": None}
+        return {"score": np.round(score, 4), "error": None}
     
     def identifier(self):
         return "DataToText"

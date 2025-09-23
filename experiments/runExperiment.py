@@ -6,12 +6,11 @@ from generation.generator import RunERGO
 from evaluation.evaluator import GSM8KEvaluator, DatabaseEvaluator, ActionsEvaluator, CodeEvaluator, DataToTextEvaluator
 
 class RunExperiment():
-    def __init__(self, model_name, api_key = None, device="cuda", device_map="auto", max_new_tokens=1024, dtype="float16", temperature=1.0, do_sample=True, openai=False):
+    def __init__(self, model_name, device="cuda", device_map="auto", max_new_tokens=1024, dtype="float16", temperature=1.0, do_sample=True, openai=False):
         self.model_name = model_name
         if 'gpt' in model_name or openai:
             self.model = OpenAIModel(
                 model_name=model_name,
-                api_key=api_key,
                 temperature=temperature,
                 max_tokens=max_new_tokens
             )

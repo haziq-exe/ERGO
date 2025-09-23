@@ -29,10 +29,10 @@ class RunERGO():
             self.num_Qs = num_Qs
 
     def execute(self, spider_DB_path=None):
-        for x in range(self.num_runs):
-            for i in range(self.num_Qs):
-                item = self.dataset.data[i]
-                messages = [self.dataset.get_base_system(i)]
+        for run in range(self.num_runs):
+            for question in range(self.num_Qs):
+                item = self.dataset.data[question]
+                messages = [self.dataset.get_base_system(question)]
                 entropies = []
                 prev_entropy = float("inf")
                 resets = []
@@ -56,18 +56,18 @@ class RunERGO():
                         resets.append(0)
 
                     if self.evaluator.identifier() == "Database":
-                        result = self.evaluator.evaluate(dataset=self.dataset, extracted_answer=new_message, spider_DB_path=spider_DB_path, question_id=i)
+                        result = self.evaluator.evaluate(dataset=self.dataset, extracted_answer=new_message, spider_DB_path=spider_DB_path, question_id=question)
                     elif self.evaluator.identifier() == "DataToText":
                         continue
                     else:
-                        result = self.evaluator.evaluate(dataset=self.dataset, extracted_answer=new_message, question_id=i)
+                        result = self.evaluator.evaluate(dataset=self.dataset, extracted_answer=new_message, question_id=question)
 
                     if shard['shard_id'] == len(item["shards"]) or result["score"] == 1.0:
                         if self.evaluator.identifier() == "DataToText":
-                            result = self.evaluator.evaluate(dataset=self.dataset, extracted_answer=new_message, question_id=i)
+                            result = self.evaluator.evaluate(dataset=self.dataset, extracted_answer=new_message, question_id=question)
 
-                        self.logger.log_entry(i, messages, new_message, entropies, resets, result)
-                        self.logger.save(x)
+                        self.logger.log_entry(question, messages, new_message, entropies, resets, result)
+                        self.logger.save(run)
                 
             
 

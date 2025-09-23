@@ -5,6 +5,7 @@ import os
 from typing import List, Dict, Any, Tuple
 from transformers import AutoTokenizer, AutoModelForCausalLM, logging
 import torch
+import sys
 
 # logging.set_verbosity_info()
 
@@ -90,8 +91,8 @@ class LocalLLMModel(BaseModel):
 
 class OpenAIModel(BaseModel):
 
-    def __init__(self, model_name, api_key, temperature, max_tokens, top_logprobs: int = 20):
-        super().__init__(model_name, api_key)
+    def __init__(self, model_name, temperature, max_tokens, top_logprobs: int = 20):
+        super().__init__(model_name)
         self.client = OpenAI(api_key = os.environ["OPENAI_KEY"])
         self.temperature = temperature
         self.max_tokens = max_tokens
@@ -113,7 +114,10 @@ class OpenAIModel(BaseModel):
         )
 
         generated_text = resp.choices[0].message.content
-        token_logprobs = resp.choices[0].logprobs.content
+        try: 
+            token_logprobs = resp.choices[0].logprobs.content
+        except:
+            sys.exit("ERROR: INPUTTED OPENAI MODEL DOESNT RETURN LOGPROBS")
 
         avg_entropy = self.compute_entropy(token_logprobs)
         # tokens_used = resp.usage.completion_tokens + resp.usage.prompt_tokens
