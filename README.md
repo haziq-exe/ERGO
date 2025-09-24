@@ -154,7 +154,7 @@ If you use ERGO in your research, please cite our paper:
   title={ERGO: Entropy-guided Resetting for Generation Optimization in Multi-turn Language Models},
   author={Khalid, Haziq Mohammad and Jeyaganthan, Athikash and Do, Timothy and 
           Fu, Yicheng and O'Brien, Sean and Sharma, Vasu and Zhu, Kevin},
-  booktitle={Proceedings of the 2nd Workshop on Uncertainty-Aware NLP (UncertaiNLP 2025)}
+  booktitle={Proceedings of the 2nd Workshop on Uncertainty-Aware NLP @ EMNLP 2025}
   year={2025}
 }
 ```
