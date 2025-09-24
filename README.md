@@ -92,6 +92,7 @@ ERGO/
 ├── evaluation/         # Evaluation metrics and scoring
 │   └── evaluator.py
 |   └── utils.py 
+|   └── eval.bfcl.py    # Taken from Laban et al.
 │
 ├── core/               # Core ERGO implementation
 │   ├── dataset.py         
@@ -142,7 +143,7 @@ ERGO has been rigorously tested across five diverse generation tasks:
 
 ## Note
 
-> **Documentation**: Comprehensive documentation is in development. For now, please refer to the paper for detailed methodology and theoretical foundations.
+> **Documentation**: More comprehensive documentation is in development. For now, please refer to the paper for detailed methodology and theoretical foundations.
 
 ## Citation
 
@@ -165,6 +166,14 @@ If you use ERGO in your research, please cite our paper:
 
 **Co-Author**: Timothy Do  
 📧 tim.do.info@gmail.com
+
+---
+## Code References
+
+- **Lost in Conversation (Laban et al)** — code accompanying the paper *LLMs Get Lost in Multi-Turn Conversation*  
+https://github.com/microsoft/lost_in_conversation
+
+
 
 ---
 
