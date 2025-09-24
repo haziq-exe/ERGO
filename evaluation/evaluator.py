@@ -119,7 +119,7 @@ class ActionsEvaluator(Evaluator):
             return {"score": 0.0, "error": corr.get("error")}
 
     def identifier(self):
-        return "GSM8K"
+        return "Actions"
     
 class DatabaseEvaluator(Evaluator):
     def __init__(self, output_file=None, dataset_path=None):
