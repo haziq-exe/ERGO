@@ -1,6 +1,7 @@
 <div align="center">
 
 # ERGO: Entropy-guided Resetting for Generation Optimization
+<br>
 
 ![ERGO Banner](READMEimg/Representative_Diagram.png)
 
