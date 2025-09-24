@@ -167,12 +167,11 @@ If you use ERGO in your research, please cite our paper:
 **Co-Author**: Timothy Do  
 📧 tim.do.info@gmail.com
 
----
+
 ## Code References
 
 - **Lost in Conversation (Laban et al)** — code accompanying the paper *LLMs Get Lost in Multi-Turn Conversation*  
 https://github.com/microsoft/lost_in_conversation
-
 
 
 ---
