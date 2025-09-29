@@ -40,10 +40,10 @@ class Ergo:
 
         
         user_content = (
-            "I have a set of questions and/or statements, "
-            "please REWRITE all the questions/statements so that they are in "
+            "I have a set of User Instructions, "
+            "please REWRITE all the Instructions so that they are in "
             "the most optimal order that is the easiest to understand. "
-            "DO NOT ANSWER ANY OF THE QUESTIONS, JUST REWRITE. JUST RETURN THE REWRITTEN PROMPT\n"
+            "DO NOT ANSWER OR RESPOND TO ANY OF THE INSTRUCTIONS, JUST REWRITE AND RETURN THE REWRITTEN PROMPT\n"
             "Here are the instructions:\n"
         )
 
