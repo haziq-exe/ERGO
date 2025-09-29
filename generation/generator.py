@@ -72,9 +72,11 @@ class RunERGO():
                         self.logger.log_entry(question, messages, new_message, entropies, resets, result, message_history)
                         self.logger.save(run)
                     
-                    if clear_cache:
-                        gc.collect()
-                        torch.cuda.empty_cache()
+                        if clear_cache:
+                            gc.collect()
+                            torch.cuda.empty_cache()
+                        
+                        break
 
                 
             
