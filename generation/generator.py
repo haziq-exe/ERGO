@@ -33,6 +33,7 @@ class RunERGO():
             for question in range(self.num_Qs):
                 item = self.dataset.data[question]
                 messages = [self.dataset.get_base_system(question)]
+                message_history = []
                 entropies = []
                 prev_entropy = float("inf")
                 resets = []
@@ -46,12 +47,14 @@ class RunERGO():
                         user_content += self.dataset.final_shard_instruct
                     messages.append({"role": "user", "content": user_content})
 
-                    entropy, new_message, reset = self.ergo.run(messages, self.dataset, prev_entropy)
+                    entropy, new_message, reset, messages, prev_prompts = self.ergo.run(messages, self.dataset, prev_entropy)
                     messages.append({"role": "assistant", "content": new_message})
                     prev_entropy = entropy
                     entropies.append(entropy)
+
                     if reset:
                         resets.append(1)
+                        message_history.append(prev_prompts)
                     else:
                         resets.append(0)
 
@@ -66,7 +69,7 @@ class RunERGO():
                         if self.evaluator.identifier() == "DataToText":
                             result = self.evaluator.evaluate(dataset=self.dataset, extracted_answer=new_message, question_id=question)
 
-                        self.logger.log_entry(question, messages, new_message, entropies, resets, result)
+                        self.logger.log_entry(question, messages, new_message, entropies, resets, result, message_history)
                         self.logger.save(run)
                 
             
