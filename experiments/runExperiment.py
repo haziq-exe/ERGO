@@ -10,8 +10,9 @@ class RunExperiment():
     Initialize an experiment with a model (local or OpenAI) and run on a specified dataset.
     """
 
-    def __init__(self, model_name, device="cuda", device_map="auto", max_new_tokens=1024, dtype="float16", temperature=1.0, do_sample=True, openai=False):
+    def __init__(self, model_name, device="cuda", device_map="auto", max_new_tokens=1024, dtype="float16", temperature=1.0, do_sample=True, openai=False, clear_cache=False):
         self.model_name = model_name
+        self.clear_cache = clear_cache
         if openai:
             self.model = OpenAIModel(
                 model_name=model_name,
@@ -36,7 +37,7 @@ class RunExperiment():
         logger = Logger(model=self.model, dataset=dataset, output_path=output_path)
         evaluator = GSM8KEvaluator(output_file=output_path, dataset_path=dataset_path)
         runner = RunERGO(model=self.model, dataset=dataset, ergo=ergo, logger=logger, evaluator=evaluator, num_Qs=num_Qs, num_runs=num_runs)
-        runner.execute()
+        runner.execute(clear_cache=self.clear_cache)
 
     def run_Database(self, dataset_path, spider_DB_path, num_Qs = None, threshold=0.5, output_path=None, num_runs=1):
         dataset = Database(dataset_path=dataset_path)
@@ -44,7 +45,7 @@ class RunExperiment():
         logger = Logger(model=self.model, dataset=dataset, output_path=output_path)
         evaluator = DatabaseEvaluator(output_file=output_path, dataset_path=dataset_path)
         runner = RunERGO(model=self.model, dataset=dataset, ergo=ergo, logger=logger, evaluator=evaluator, num_Qs=num_Qs, num_runs=num_runs)
-        runner.execute(spider_DB_path=spider_DB_path)
+        runner.execute(spider_DB_path=spider_DB_path, clear_cache=self.clear_cache)
 
     def run_Code(self, dataset_path, num_Qs = None, threshold=0.5, output_path=None, num_runs=1):
         dataset = Code(dataset_path=dataset_path)
@@ -52,7 +53,7 @@ class RunExperiment():
         logger = Logger(model=self.model, dataset=dataset, output_path=output_path)
         evaluator = CodeEvaluator(output_file=output_path, dataset_path=dataset_path)
         runner = RunERGO(model=self.model, dataset=dataset, ergo=ergo, logger=logger, evaluator=evaluator, num_Qs=num_Qs, num_runs=num_runs)
-        runner.execute()
+        runner.execute(clear_cache=self.clear_cache)
 
     def run_Actions(self, dataset_path, num_Qs = None, threshold=0.5, output_path=None, num_runs=1):
         dataset = Actions(dataset_path=dataset_path)
@@ -60,7 +61,7 @@ class RunExperiment():
         logger = Logger(model=self.model, dataset=dataset, output_path=output_path)
         evaluator = ActionsEvaluator(output_file=output_path, dataset_path=dataset_path)
         runner = RunERGO(model=self.model, dataset=dataset, ergo=ergo, logger=logger, evaluator=evaluator, num_Qs=num_Qs, num_runs=num_runs)
-        runner.execute()
+        runner.execute(clear_cache=self.clear_cache)
 
     def run_DataToText(self, dataset_path, num_Qs = None, threshold=0.5, output_path=None, num_runs=1):
         dataset = DataToText(dataset_path=dataset_path)
@@ -68,4 +69,4 @@ class RunExperiment():
         logger = Logger(model=self.model, dataset=dataset, output_path=output_path)
         evaluator = DataToTextEvaluator(output_file=output_path, dataset_path=dataset_path)
         runner = RunERGO(model=self.model, dataset=dataset, ergo=ergo, logger=logger, evaluator=evaluator, num_Qs=num_Qs, num_runs=num_runs)
-        runner.execute()
+        runner.execute(clear_cache=self.clear_cache)

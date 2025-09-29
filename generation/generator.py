@@ -3,7 +3,7 @@ from core.dataset import Dataset
 from core.ergo import Ergo
 from core.utils import Logger
 from evaluation.evaluator import GSM8KEvaluator, ActionsEvaluator, CodeEvaluator, DatabaseEvaluator, DataToTextEvaluator, Evaluator
-import random
+import random, gc, torch
 
 class RunERGO():
     def __init__(self, model: BaseModel, dataset: Dataset, evaluator: Evaluator,  ergo: Ergo, logger: Logger, num_Qs : int, num_runs : int = 1):
@@ -28,7 +28,7 @@ class RunERGO():
         else:
             self.num_Qs = num_Qs
 
-    def execute(self, spider_DB_path=None):
+    def execute(self, spider_DB_path=None, clear_cache=False):
         for run in range(self.num_runs):
             for question in range(self.num_Qs):
                 item = self.dataset.data[question]
@@ -71,6 +71,11 @@ class RunERGO():
 
                         self.logger.log_entry(question, messages, new_message, entropies, resets, result, message_history)
                         self.logger.save(run)
+                    
+                    if clear_cache:
+                        gc.collect()
+                        torch.cuda.empty_cache()
+
                 
             
 
