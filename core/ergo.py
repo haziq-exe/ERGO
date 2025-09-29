@@ -67,15 +67,18 @@ class Ergo:
         """
         avg_entropy, response = self.model.generate(sharded_prompt)
         reset = False
+        prev_prompts = None
         
         if avg_entropy - prev_entropy >= self.threshold:
             reset = True
             rewritten = self.rewrite_prompt(sharded_prompt, dataset)
             _, rewritten_context = self.model.generate(rewritten)
 
+            prev_prompts = sharded_prompt.copy()
+
             sharded_prompt = [msg for msg in sharded_prompt if msg["role"] == "system"]
 
             sharded_prompt.append({"role": "user", "content": rewritten_context})
             avg_entropy, response = self.model.generate(sharded_prompt)
 
-        return avg_entropy, response, reset
+        return avg_entropy, response, reset, sharded_prompt, prev_prompts
