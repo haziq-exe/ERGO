@@ -10,7 +10,7 @@ class RunExperiment():
     Initialize an experiment with a model (local or OpenAI) and run on a specified dataset.
     """
 
-    def __init__(self, model_name, device="cuda", device_map="auto", max_new_tokens=1024, dtype="float16", temperature=1.0, do_sample=True, openai=False, clear_cache=False):
+    def __init__(self, model_name, device="cuda", device_map="auto", max_new_tokens=1024, dtype="float16", temperature=1.0, do_sample=True, openai=False, clear_cache=True):
         self.model_name = model_name
         self.clear_cache = clear_cache
         if openai:

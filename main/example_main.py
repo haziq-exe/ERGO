@@ -1,3 +1,5 @@
+import sys, os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from experiments.runExperiment import RunExperiment
 
 # "OPENAI_KEY" key must be set in environment variable
@@ -9,13 +11,14 @@ Example_Experiment = RunExperiment(
     device="cpu", 
     device_map=None, 
     max_new_tokens=1000, 
-    openai = False
+    openai = False,
+    clear_cache=True
 )
 
 Example_Experiment.run_GSM8K(
     dataset_path="sharded_dataset.json", # Path to sharded dataset from Laban et al.
     num_Qs=5, 
     num_runs=1, 
-    threshold=0.3, 
+    threshold=0.001, 
     output_path="outputs/gsm8k_example.json"
 )
