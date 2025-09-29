@@ -1,8 +1,8 @@
 # core/ergo.py
-from typing import List, Dict
 from .model import BaseModel
 from .dataset import Dataset
 from .prompts import GSM8K_prompt, Code_prompt, D2T_prompt, DB_prompt
+import re
 
 
 class Ergo:
@@ -77,8 +77,11 @@ class Ergo:
             prev_prompts = sharded_prompt.copy()
 
             sharded_prompt = [msg for msg in sharded_prompt if msg["role"] == "system"]
+            rewritten_context = re.sub(r"<think>.*?</think>", "", rewritten_context, flags=re.DOTALL)
 
             sharded_prompt.append({"role": "user", "content": rewritten_context})
             avg_entropy, response = self.model.generate(sharded_prompt)
+
+        response = re.sub(r"<think>.*?</think>", "", response, flags=re.DOTALL)
 
         return avg_entropy, response, reset, sharded_prompt, prev_prompts
