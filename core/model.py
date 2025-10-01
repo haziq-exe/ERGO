@@ -70,7 +70,8 @@ class LocalLLMModel(BaseModel):
             add_generation_prompt=True
         )
 
-        inputs = self.tokenizer(prompt, return_tensors="pt", truncation=True)
+        entry_device = next(self.model.parameters()).device
+        inputs = {k: v.to(entry_device) for k, v in inputs.items()}
 
         with torch.no_grad():
             outputs = self.model.generate(
