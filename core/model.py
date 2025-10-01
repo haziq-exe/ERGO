@@ -64,21 +64,38 @@ class LocalLLMModel(BaseModel):
         Returns: (avg_entropy, generated_text)
         """
 
+        # Build prompt from chat template
         prompt = self.tokenizer.apply_chat_template(
             messages,
             tokenize=False,
             add_generation_prompt=True
         )
 
+        # Tokenize
         inputs = self.tokenizer(prompt, return_tensors="pt", truncation=True)
-        entry_device = next(self.model.parameters()).device
-        inputs = {k: v.to(entry_device) for k, v in inputs.items()}
 
+        # If model is sharded (device_map="auto"), we don't move everything to a single device.
+        # Instead, Hugging Face will handle placement. Just make sure tensors are on the
+        # same device as the first embedding layer.
+        if hasattr(self.model, "hf_device_map"):
+            # Find first device in model's device map
+            first_device = next(iter(self.model.hf_device_map.values()))
+            if isinstance(first_device, str):
+                target_device = torch.device(first_device)
+            else:
+                # In some cases device map values are ints
+                target_device = torch.device(f"cuda:{first_device}")
+        else:
+            target_device = self.model.device
 
+        # Move only non-None tensors
+        inputs = {k: v.to(target_device) for k, v in inputs.items() if v is not None}
+
+        # Run generation
         with torch.no_grad():
             outputs = self.model.generate(
                 **inputs,
-                max_new_tokens= self.max_new_tokens,
+                max_new_tokens=self.max_new_tokens,
                 return_dict_in_generate=True,
                 output_scores=True,
                 do_sample=self.do_sample,
@@ -87,18 +104,17 @@ class LocalLLMModel(BaseModel):
                 temperature=self.temperature,
             )
 
-            logits = torch.stack(outputs.scores)
+            logits = torch.stack(outputs.scores)  # (seq_len, batch, vocab)
             probs = torch.softmax(logits, dim=-1)
             avg_entropy = self.compute_entropy(probs)
-        
+
+        # Extract only generated tokens
         response_ids = outputs.sequences
-        input_len = inputs.input_ids.shape[1]
+        input_len = inputs["input_ids"].shape[1]
         new_tokens = response_ids[:, input_len:]
         response_only = self.tokenizer.batch_decode(new_tokens, skip_special_tokens=True)[0]
 
-        # tokens_used = response_ids.shape[1] 
-
-        return avg_entropy, response_only # tokens_used 
+        return avg_entropy, response_only
 
     def compute_entropy(self, probs):
         entropy = -torch.sum(probs * torch.log(probs + 1e-8), dim=-1)
