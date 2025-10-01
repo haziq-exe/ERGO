@@ -74,21 +74,16 @@ class LocalLLMModel(BaseModel):
         # Tokenize
         inputs = self.tokenizer(prompt, return_tensors="pt", truncation=True)
 
-        # If model is sharded (device_map="auto"), we don't move everything to a single device.
-        # Instead, Hugging Face will handle placement. Just make sure tensors are on the
-        # same device as the first embedding layer.
         if hasattr(self.model, "hf_device_map"):
-            # Find first device in model's device map
-            first_device = next(iter(self.model.hf_device_map.values()))
-            if isinstance(first_device, str):
-                target_device = torch.device(first_device)
+            embed_layer = "model.embed_tokens"
+            embed_device_id = self.model.hf_device_map[embed_layer]
+            if isinstance(embed_device_id, str):
+                target_device = torch.device(embed_device_id)
             else:
-                # In some cases device map values are ints
-                target_device = torch.device(f"cuda:{first_device}")
+                target_device = torch.device(f"cuda:{embed_device_id}")
         else:
             target_device = self.model.device
 
-        # Move only non-None tensors
         inputs = {k: v.to(target_device) for k, v in inputs.items() if v is not None}
 
         # Run generation
