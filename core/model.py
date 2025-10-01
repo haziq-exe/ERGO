@@ -39,12 +39,19 @@ class LocalLLMModel(BaseModel):
 
         self.tokenizer = AutoTokenizer.from_pretrained(model_name,  trust_remote_code=True)
 
-        self.model = AutoModelForCausalLM.from_pretrained(
-            model_name,
-            dtype=dtype,
-            device_map=device_map,
-             trust_remote_code=True
-        ).to(device)
+        if device:
+            self.model = AutoModelForCausalLM.from_pretrained(
+                model_name,
+                dtype=dtype,
+                device_map=device_map,
+                trust_remote_code=True
+            ).to(device)
+        else:
+            self.model = AutoModelForCausalLM.from_pretrained(
+                model_name,
+                dtype=dtype,
+                trust_remote_code=True
+            )
 
         self.device = device
         self.temperature = temperature
@@ -63,7 +70,10 @@ class LocalLLMModel(BaseModel):
             add_generation_prompt=True
         )
 
-        inputs = self.tokenizer(prompt, return_tensors="pt", truncation=True).to(self.device)
+        if self.device:
+            inputs = self.tokenizer(prompt, return_tensors="pt", truncation=True).to(self.device)
+        else:
+            inputs = self.tokenizer(prompt, return_tensors="pt", truncation=True)
 
         with torch.no_grad():
             outputs = self.model.generate(
