@@ -70,12 +70,11 @@ class LocalLLMModel(BaseModel):
             add_generation_prompt=True
         )
 
-        inputs = self.tokenizer(prompt, return_tensors="pt", truncation=True).to(self.model.device)
+        inputs = self.tokenizer(prompt, return_tensors="pt", truncation=True)
 
         with torch.no_grad():
             outputs = self.model.generate(
-                inputs.input_ids,
-                attention_mask=inputs.attention_mask,
+                **inputs,
                 max_new_tokens= self.max_new_tokens,
                 return_dict_in_generate=True,
                 output_scores=True,
