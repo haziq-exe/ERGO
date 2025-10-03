@@ -3,3 +3,4 @@ torch
 transformers
 numpy
 sacrebleu
+sentence_transformers

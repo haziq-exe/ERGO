@@ -61,6 +61,8 @@ class LocalLLMModel(BaseModel):
         self.temperature = temperature
         self.max_new_tokens = max_new_tokens
         self.do_sample = do_sample
+        self.embedding_model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+        self.entailment_model = pipeline("text-classification", model="roberta-large-mnli")
 
 
     def generate_with_temperature(self, messages, temperature, perturb_first_n=0):
