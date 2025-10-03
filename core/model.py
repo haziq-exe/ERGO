@@ -146,8 +146,29 @@ class LocalLLMModel(BaseModel):
         )
 
 
+        
+        inputs = {k: v.to(self.model.device) for k, v in inputs.items()}
+
+        print(f"Model's reported device: {self.model.device}")
+        print(f"First parameter device: {next(self.model.parameters()).device}")
+        print(f"Embedding layer device: {self.model.get_input_embeddings().weight.device}")
+
+        # 2. Check model's device map (shows which layers are on which GPU)
+        if hasattr(self.model, 'hf_device_map'):
+            print(f"Model device map: {self.model.hf_device_map}")
+
+        # 3. Check input tensors
         inputs = self.tokenizer(prompt, return_tensors="pt", truncation=True)
-        inputs = {k: v.to(model.device) for k, v in inputs.items()}
+        print("\nInput tensor devices:")
+        for key, value in inputs.items():
+            print(f"  {key}: device={value.device}, shape={value.shape}")
+
+        # 4. After moving inputs (if you do)
+        inputs = {k: v.to(self.model.device) for k, v in inputs.items()}
+        print(f"\nAfter moving to {self.model.device}:")
+
+        for key, value in inputs.items():
+            print(f"  {key}: {value.device}")
 
         with torch.no_grad():
             outputs = self.model.generate(
