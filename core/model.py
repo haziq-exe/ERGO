@@ -42,6 +42,7 @@ class LocalLLMModel(BaseModel):
         super().__init__(model_name)
 
         self.tokenizer = AutoTokenizer.from_pretrained(model_name,  trust_remote_code=True)
+        self.move_inputs = False if device_map else True
 
         if device:
             self.model = AutoModelForCausalLM.from_pretrained(
@@ -146,7 +147,7 @@ class LocalLLMModel(BaseModel):
             add_generation_prompt=True
         )
 
-        if self.device:
+        if self.device and self.move_inputs:
             inputs = self.tokenizer(prompt, return_tensors="pt", truncation=True).to(self.device)
         else:
             inputs = self.tokenizer(prompt, return_tensors="pt", truncation=True)
