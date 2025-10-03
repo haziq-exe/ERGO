@@ -64,58 +64,21 @@ class LocalLLMModel(BaseModel):
         Returns: (avg_entropy, generated_text)
         """
 
-        # Build prompt
+
         prompt = self.tokenizer.apply_chat_template(
             messages,
             tokenize=False,
             add_generation_prompt=True
         )
 
-        # Tokenize (returns BatchEncoding)
-        raw_inputs = self.tokenizer(prompt, return_tensors="pt", truncation=True)
-
-        # Convert BatchEncoding -> plain dict (use .data if available)
-        if hasattr(raw_inputs, "data"):
-            inputs_dict = dict(raw_inputs.data)
+        if self.device:
+            inputs = self.tokenizer(prompt, return_tensors="pt", truncation=True).to(self.device)
         else:
-            inputs_dict = dict(raw_inputs)
+            inputs = self.tokenizer(prompt, return_tensors="pt", truncation=True)
 
-        # Keep only torch.Tensor values (drop None and non-tensor fields)
-        tensor_inputs = {k: v for k, v in inputs_dict.items() if isinstance(v, torch.Tensor)}
-
-        if "input_ids" not in tensor_inputs:
-            raise RuntimeError("tokenizer did not return 'input_ids' as a tensor")
-
-        # Determine device of input embeddings (most reliable)
-        embed_device = None
-        try:
-            emb = self.model.get_input_embeddings()
-            embed_param = next(emb.parameters())  # will raise if no params
-            embed_device = embed_param.device
-        except Exception:
-            # Fallback to hf_device_map lookup for standard key
-            if hasattr(self.model, "hf_device_map"):
-                dev_id = self.model.hf_device_map.get("model.embed_tokens", None)
-                if dev_id is not None:
-                    if isinstance(dev_id, str):
-                        embed_device = torch.device(dev_id)
-                    else:
-                        embed_device = torch.device(f"cuda:{dev_id}")
-
-        # Final fallback to model.device or cpu
-        if embed_device is None:
-            embed_device = getattr(self.model, "device", torch.device("cpu"))
-
-        # Move tensors to embed device (only tensors)
-        tensor_inputs = {k: v.to(embed_device) for k, v in tensor_inputs.items()}
-
-        # DEBUG: show devices (remove or comment out later)
-        # print("Input tensor devices:", {k: v.device for k, v in tensor_inputs.items()})
-
-        # Generation
         with torch.no_grad():
             outputs = self.model.generate(
-                **tensor_inputs,
+                **inputs,
                 max_new_tokens=self.max_new_tokens,
                 return_dict_in_generate=True,
                 output_scores=True,
@@ -125,19 +88,17 @@ class LocalLLMModel(BaseModel):
                 temperature=self.temperature,
             )
 
-            # Stack scores safely on the device they're on
-            scores = outputs.scores  # list of tensors
+            scores = outputs.scores
             if scores:
                 base_dev = scores[0].device
-                logits = torch.stack([s.to(base_dev) for s in scores])  # (seq_len, batch, vocab)
+                logits = torch.stack([s.to(base_dev) for s in scores])
                 probs = torch.softmax(logits, dim=-1)
                 avg_entropy = self.compute_entropy(probs)
             else:
                 avg_entropy = None
 
-        # Extract generated tokens (move to CPU before decoding)
-        response_ids = outputs.sequences  # (batch, seq_len_total)
-        input_len = tensor_inputs["input_ids"].shape[1]
+        response_ids = outputs.sequences
+        input_len = inputs["input_ids"].shape[1]
         new_tokens = response_ids[:, input_len:].cpu()
         response_only = self.tokenizer.batch_decode(new_tokens, skip_special_tokens=True)[0]
 
