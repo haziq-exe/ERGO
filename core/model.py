@@ -153,13 +153,17 @@ class LocalLLMModel(BaseModel):
         return util.pytorch_cos_sim(emb1, emb2).item()
 
     def semantic_similarity_entailment(self, text1, text2):
-        res1 = self.entailment_model(f"{text1}</s></s>{text2}")[0]
-        res2 = self.entailment_model(f"{text2}</s></s>{text1}")[0]
+        # Simple truncation - will truncate from the end
+        res1 = self.entailment_model(
+            f"{text1}</s></s>{text2}",
+            truncation=True
+        )[0]
+        res2 = self.entailment_model(
+            f"{text2}</s></s>{text1}",
+            truncation=True
+        )[0]
         
-        score1 = res1['score'] if res1['label'] == 'ENTAILMENT' else 1 - res1['score']
-        score2 = res2['score'] if res2['label'] == 'ENTAILMENT' else 1 - res2['score']
-
-        return (score1 + score2) / 2.0
+        return (res1 + res2) / 2.0
 
     def generate(self, messages):
         """
