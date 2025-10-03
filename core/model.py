@@ -83,6 +83,7 @@ class LocalLLMModel(BaseModel):
         if perturb_first_n > 0:
             generated = inputs["input_ids"]
             past_key_values = None
+            print(f"Generating with perturb_first_n={perturb_first_n} at temp=1.5, then temp={temperature}: ")
             for i in range(self.max_new_tokens):
                 with torch.no_grad():
                     outputs = self.model(
@@ -96,11 +97,15 @@ class LocalLLMModel(BaseModel):
                 if i < perturb_first_n:
                     t = 1.5  # perturb temp
                 else:
+                    print("\nSwitching to normal temperature\n")
                     t = temperature
 
                 probs = F.softmax(logits / t, dim=-1)
                 next_token = torch.multinomial(probs, num_samples=1)
                 generated = torch.cat([generated, next_token], dim=-1)
+                print(next_token)
+                if (next_token == self.tokenizer.eos_token_id).all():
+                    break
 
             new_tokens = generated[:, inputs["input_ids"].shape[1]:]
 
@@ -117,6 +122,9 @@ class LocalLLMModel(BaseModel):
                 eos_token_id=self.tokenizer.eos_token_id,
             )
         new_tokens = outputs[:, inputs["input_ids"].shape[1]:]
+
+        print(f"Generated (temp={temperature}): {self.tokenizer.decode(new_tokens[0], skip_special_tokens=True)}")
+
         return self.tokenizer.decode(new_tokens[0], skip_special_tokens=True)
     
     def semantic_similarity_embeddings(self, text1, text2):
@@ -177,8 +185,9 @@ class LocalLLMModel(BaseModel):
         new_tokens = response_ids[:, input_len:].cpu()
         response_only = self.tokenizer.batch_decode(new_tokens, skip_special_tokens=True)[0]
 
+        print(f"Generated (temp={self.temperature}): {response_only}")
 
-                # ----- Other runs for robustness divergence -----
+        # ----- Other runs for robustness divergence -----
         r0 = self.generate_with_temperature(messages, temperature=0.2)
         r1 = response_only
         # perturb: 1% of length of r1, at least 1 token
