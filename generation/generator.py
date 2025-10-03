@@ -47,16 +47,17 @@ class RunERGO():
                         user_content += self.dataset.final_shard_instruct
                     messages.append({"role": "user", "content": user_content})
 
-                    entropy, new_message, reset, messages, prev_prompts = self.ergo.run(messages, self.dataset, prev_entropy)
+                    entropy, new_message, reset, messages, prev_prompts, r0, rh = self.ergo.run(messages, self.dataset, prev_entropy)
                     messages.append({"role": "assistant", "content": new_message})
                     prev_entropy = entropy
+                    message_history.append({"r0": r0, "rh": rh})
                     
                     for k in entropies.keys():
                         entropies[k].append(entropy[k])
 
                     if reset:
                         resets.append(1)
-                        message_history.append(prev_prompts)
+                        # message_history.append(prev_prompts)
                     else:
                         resets.append(0)
 

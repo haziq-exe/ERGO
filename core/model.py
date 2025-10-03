@@ -246,7 +246,7 @@ class LocalLLMModel(BaseModel):
             "perplexity": ppl,
             "rds_embed": rds_embed,
             "rds_entail": rds_entail
-        }, response_only
+        }, response_only, r0, rh
 
     def compute_entropy(self, probs):
         entropy = -torch.sum(probs * torch.log(probs + 1e-8), dim=-1)

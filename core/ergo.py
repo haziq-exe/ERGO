@@ -65,7 +65,7 @@ class Ergo:
         - Check entropy
         - If above threshold, rewrite prompt, start new context with just rewritten prompt and regenerate
         """
-        avg_entropy, response = self.model.generate(sharded_prompt)
+        avg_entropy, response, r0, rh = self.model.generate(sharded_prompt)
         reset = False
         prev_prompts = None
         
@@ -84,4 +84,4 @@ class Ergo:
 
         response = re.sub(r"<think>[\s\S]*?(?:</think>|$)", "", response, flags=re.DOTALL)
 
-        return avg_entropy, response, reset, sharded_prompt, prev_prompts
+        return avg_entropy, response, reset, sharded_prompt, prev_prompts, r0, rh
