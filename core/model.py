@@ -154,6 +154,7 @@ class LocalLLMModel(BaseModel):
 
         inputs = self.tokenizer(prompt, return_tensors="pt", truncation=True)
         inputs = {k: v.to(self.model.device) for k, v in inputs.items()}
+        input_length = inputs["input_ids"].shape[1]
 
         with torch.no_grad():
             outputs = self.model.generate(
@@ -179,6 +180,7 @@ class LocalLLMModel(BaseModel):
             else:
                 avg_entropy = None
 
+        output_length = outputs.shape[1]
         response_ids = outputs.sequences
         input_len = inputs["input_ids"].shape[1]
         new_tokens = response_ids[:, input_len:].cpu()
@@ -190,7 +192,7 @@ class LocalLLMModel(BaseModel):
         r0 = self.generate_with_temperature(messages, temperature=0.2)
         r1 = re.sub(r"<think>[\s\S]*?(?:</think>|$)", "", response_only, flags=re.DOTALL)
         # perturb: 1% of length of r1, at least 1 token
-        perturb_n = max(1, int(0.01 * (outputs.shape[1] - inputs.shape[1])))
+        perturb_n = max(1, int(0.01 * (output_length - input_length)))
         rh = self.generate_with_temperature(messages, temperature=1.0, perturb_first_n=perturb_n)
 
         r0 = re.sub(r"<think>[\s\S]*?(?:</think>|$)", "", r0, flags=re.DOTALL)
