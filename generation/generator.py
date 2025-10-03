@@ -34,7 +34,7 @@ class RunERGO():
                 item = self.dataset.data[question]
                 messages = [self.dataset.get_base_system(question)]
                 message_history = []
-                entropies = {"avg_entropy": [], "rds_entail": [], "rds_embed": [], "maxprob": [], "margin": [], "norm_entropy": [], "perplexity": []}
+                entropies = {"avg_entropy": [], "rds_entail": [], "rds_embed": [], "margin": [], "norm_entropy": [], "perplexity": []}
                 prev_entropy = float("inf")
                 resets = []
 

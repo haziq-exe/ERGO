@@ -169,7 +169,6 @@ class LocalLLMModel(BaseModel):
                 logits = torch.stack([s.to(base_dev) for s in scores])
                 probs = torch.softmax(logits, dim=-1)
                 avg_entropy = self.compute_entropy(probs)
-                avg_maxprob = self.compute_maxprob(probs)
                 avg_margin = self.compute_logit_margin(probs)
                 norm_entropy = self.compute_normalized_entropy(probs)
                 ppl = self.compute_perplexity(avg_entropy)
@@ -206,7 +205,6 @@ class LocalLLMModel(BaseModel):
 
         return {
             "avg_entropy": avg_entropy,
-            "maxprob": avg_maxprob,
             "margin": avg_margin,
             "norm_entropy": norm_entropy,
             "perplexity": ppl,
