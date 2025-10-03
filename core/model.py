@@ -162,8 +162,8 @@ class LocalLLMModel(BaseModel):
             f"{text2}</s></s>{text1}",
             truncation=True
         )[0]
-        
-        return (res1 + res2) / 2.0
+
+        return (res1['score'] + res2['score']) / 2
 
     def generate(self, messages):
         """
