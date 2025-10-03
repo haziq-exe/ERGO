@@ -47,13 +47,13 @@ class LocalLLMModel(BaseModel):
             self.model = AutoModelForCausalLM.from_pretrained(
                 model_name,
                 dtype=dtype,
-                device_map=device_map,
                 trust_remote_code=True
             ).to(device)
         else:
             self.model = AutoModelForCausalLM.from_pretrained(
                 model_name,
                 dtype=dtype,
+                device_map=device_map,
                 trust_remote_code=True
             )
 
