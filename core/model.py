@@ -236,16 +236,16 @@ class LocalLLMModel(BaseModel):
             self.semantic_similarity_entailment(r1, rh)
         ]
 
-        rds_embed = 1 - sum(sims_embed) / 3.0
-        rds_entail = 1 - sum(sims_entail) / 3.0
+        # rds_embed = 1 - sum(sims_embed) / 3.0
+        # rds_entail = 1 - sum(sims_entail) / 3.0
 
         return {
             "avg_entropy": avg_entropy,
             "margin": avg_margin,
             "norm_entropy": norm_entropy,
             "perplexity": ppl,
-            "rds_embed": rds_embed,
-            "rds_entail": rds_entail
+            "rds_embed": sims_embed,
+            "rds_entail": sims_entail
         }, response_only, r0, rh
 
     def compute_entropy(self, probs):
