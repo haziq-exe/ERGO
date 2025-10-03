@@ -71,46 +71,67 @@ class LocalLLMModel(BaseModel):
         Generate with given temperature, 
         with optional hybrid perturbation (first N tokens at temp).
         """
-
         prompt = self.tokenizer.apply_chat_template(
             messages,
             tokenize=False,
             add_generation_prompt=True
         )
         inputs = self.tokenizer(prompt, return_tensors="pt", truncation=True)
-        inputs = {k: v.to(self.model.device) for k, v in inputs.items()}
+        
+        # Handle multi-GPU device placement correctly
+        if hasattr(self.model, 'hf_device_map'):
+            device = next(self.model.parameters()).device
+        else:
+            device = self.model.device
+        inputs = {k: v.to(device) for k, v in inputs.items()}
+        
+        input_length = inputs["input_ids"].shape[1]
 
-        # custom loop if hybrid perturbation needed
+        # Custom loop if hybrid perturbation needed
         if perturb_first_n > 0:
             generated = inputs["input_ids"]
+            attention_mask = inputs.get("attention_mask", None)
             past_key_values = None
-            print(f"Generating with perturb_first_n={perturb_first_n} at temp=1.5, then temp={temperature}: ")
+            
+            print(f"Generating with perturb_first_n={perturb_first_n} at temp=1.5, then temp={temperature}")
+            
             for i in range(self.max_new_tokens):
                 with torch.no_grad():
                     outputs = self.model(
-                        input_ids=generated,
+                        input_ids=generated if past_key_values is None else generated[:, -1:],  # Only last token after first iteration
+                        attention_mask=attention_mask,
                         past_key_values=past_key_values,
                         use_cache=True
                     )
+                
                 logits = outputs.logits[:, -1, :]
                 past_key_values = outputs.past_key_values
 
-                if i < perturb_first_n:
-                    t = 1.5  # perturb temp
-                else:
-                    t = temperature
+                # Set temperature based on token position
+                t = 1.5 if i < perturb_first_n else temperature
 
+                # Sample next token with temperature
                 probs = F.softmax(logits / t, dim=-1)
                 next_token = torch.multinomial(probs, num_samples=1)
+                
+                # Update generated sequence and attention mask
                 generated = torch.cat([generated, next_token], dim=-1)
-                if (next_token == self.tokenizer.eos_token_id).all():
+                if attention_mask is not None:
+                    attention_mask = torch.cat([
+                        attention_mask,
+                        torch.ones((attention_mask.shape[0], 1), device=device, dtype=attention_mask.dtype)
+                    ], dim=-1)
+                
+                # Check for EOS
+                if next_token.item() == self.tokenizer.eos_token_id:
                     break
 
-            new_tokens = generated[:, inputs["input_ids"].shape[1]:]
+            new_tokens = generated[:, input_length:]
+            generated_text = self.tokenizer.decode(new_tokens[0], skip_special_tokens=True)
+            print(f"Generated (hybrid temp): {generated_text}")
+            return generated_text
 
-            return self.tokenizer.decode(new_tokens[0], skip_special_tokens=True)
-
-        # simple case: normal generate
+        # Simple case: use built-in generate
         with torch.no_grad():
             outputs = self.model.generate(
                 **inputs,
@@ -120,11 +141,11 @@ class LocalLLMModel(BaseModel):
                 pad_token_id=self.tokenizer.eos_token_id,
                 eos_token_id=self.tokenizer.eos_token_id,
             )
-        new_tokens = outputs[:, inputs["input_ids"].shape[1]:]
-
-        print(f"Generated (temp={temperature}): {self.tokenizer.decode(new_tokens[0], skip_special_tokens=True)}")
-
-        return self.tokenizer.decode(new_tokens[0], skip_special_tokens=True)
+        
+        new_tokens = outputs[:, input_length:]
+        generated_text = self.tokenizer.decode(new_tokens[0], skip_special_tokens=True)
+        print(f"Generated (temp={temperature}): {generated_text}")
+        return generated_text
     
     def semantic_similarity_embeddings(self, text1, text2):
         emb1 = self.embedding_model.encode(text1, convert_to_tensor=True)
@@ -133,11 +154,9 @@ class LocalLLMModel(BaseModel):
 
     def semantic_similarity_entailment(self, text1, text2):
         # check entailment both ways
-        res1 = self.entailment_model({"text": text1, "text_pair": text2})[0]
-        res2 = self.entailment_model({"text": text2, "text_pair": text1})[0]
-        score1 = res1["score"] if res1["label"] == "ENTAILMENT" else 0.0
-        score2 = res2["score"] if res2["label"] == "ENTAILMENT" else 0.0
-        return (score1 + score2) / 2.0
+        res1 = self.entailment_model(text1, text2)
+        res2 = self.entailment_model(text2, text1)
+        return (res2[0] + res1[0]) / 2.0
 
     def generate(self, messages):
         """
