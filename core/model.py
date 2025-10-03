@@ -42,7 +42,6 @@ class LocalLLMModel(BaseModel):
         super().__init__(model_name)
 
         self.tokenizer = AutoTokenizer.from_pretrained(model_name,  trust_remote_code=True)
-        self.move_inputs = False if device_map else True
 
         if device:
             self.model = AutoModelForCausalLM.from_pretrained(
@@ -78,8 +77,7 @@ class LocalLLMModel(BaseModel):
             add_generation_prompt=True
         )
         inputs = self.tokenizer(prompt, return_tensors="pt", truncation=True)
-        if self.device:
-            inputs = inputs.to(self.device)
+        inputs = {k: v.to(self.model.device) for k, v in inputs.items()}
 
         # custom loop if hybrid perturbation needed
         if perturb_first_n > 0:
@@ -147,10 +145,9 @@ class LocalLLMModel(BaseModel):
             add_generation_prompt=True
         )
 
-        if self.device and self.move_inputs:
-            inputs = self.tokenizer(prompt, return_tensors="pt", truncation=True).to(self.device)
-        else:
-            inputs = self.tokenizer(prompt, return_tensors="pt", truncation=True)
+
+        inputs = self.tokenizer(prompt, return_tensors="pt", truncation=True)
+        inputs = {k: v.to(model.device) for k, v in inputs.items()}
 
         with torch.no_grad():
             outputs = self.model.generate(
