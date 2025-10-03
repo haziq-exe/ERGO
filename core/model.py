@@ -146,8 +146,6 @@ class LocalLLMModel(BaseModel):
         )
 
 
-        
-        inputs = {k: v.to(self.model.device) for k, v in inputs.items()}
 
         print(f"Model's reported device: {self.model.device}")
         print(f"First parameter device: {next(self.model.parameters()).device}")
