@@ -3,6 +3,3 @@ torch
 transformers
 numpy
 sacrebleu
-
-# dev/test
-pytest

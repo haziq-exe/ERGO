@@ -34,7 +34,7 @@ class RunERGO():
                 item = self.dataset.data[question]
                 messages = [self.dataset.get_base_system(question)]
                 message_history = []
-                entropies = []
+                entropies = {"avg_entropy": [], "rds_entail": [], "rds_embed": [], "maxprob": [], "margin": [], "norm_entropy": [], "perplexity": []}
                 prev_entropy = float("inf")
                 resets = []
 
@@ -50,7 +50,9 @@ class RunERGO():
                     entropy, new_message, reset, messages, prev_prompts = self.ergo.run(messages, self.dataset, prev_entropy)
                     messages.append({"role": "assistant", "content": new_message})
                     prev_entropy = entropy
-                    entropies.append(entropy)
+                    
+                    for k in entropies.keys():
+                        entropies[k].append(entropy[k])
 
                     if reset:
                         resets.append(1)

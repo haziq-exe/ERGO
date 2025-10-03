@@ -69,18 +69,18 @@ class Ergo:
         reset = False
         prev_prompts = None
         
-        if avg_entropy - prev_entropy >= self.threshold:
-            reset = True
-            rewritten = self.rewrite_prompt(sharded_prompt, dataset)
-            _, rewritten_context = self.model.generate(rewritten)
+        # if avg_entropy - prev_entropy >= self.threshold:
+        #     reset = True
+        #     rewritten = self.rewrite_prompt(sharded_prompt, dataset)
+        #     _, rewritten_context = self.model.generate(rewritten)
 
-            prev_prompts = sharded_prompt.copy()
+        #     prev_prompts = sharded_prompt.copy()
 
-            sharded_prompt = [msg for msg in sharded_prompt if msg["role"] == "system"]
-            rewritten_context = re.sub(r"<think>[\s\S]*?(?:</think>|$)", "", rewritten_context, flags=re.DOTALL)
+        #     sharded_prompt = [msg for msg in sharded_prompt if msg["role"] == "system"]
+        #     rewritten_context = re.sub(r"<think>[\s\S]*?(?:</think>|$)", "", rewritten_context, flags=re.DOTALL)
 
-            sharded_prompt.append({"role": "user", "content": rewritten_context})
-            avg_entropy, response = self.model.generate(sharded_prompt)
+        #     sharded_prompt.append({"role": "user", "content": rewritten_context})
+        #     avg_entropy, response = self.model.generate(sharded_prompt)
 
         response = re.sub(r"<think>[\s\S]*?(?:</think>|$)", "", response, flags=re.DOTALL)
 
