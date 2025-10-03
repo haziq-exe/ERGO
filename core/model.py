@@ -5,6 +5,7 @@ import os
 from typing import List, Dict, Any, Tuple
 from transformers import AutoTokenizer, AutoModelForCausalLM, logging
 from torch.nn import functional as F
+import re
 import torch
 from sentence_transformers import SentenceTransformer, util
 from transformers import pipeline
@@ -97,13 +98,11 @@ class LocalLLMModel(BaseModel):
                 if i < perturb_first_n:
                     t = 1.5  # perturb temp
                 else:
-                    print("\nSwitching to normal temperature\n")
                     t = temperature
 
                 probs = F.softmax(logits / t, dim=-1)
                 next_token = torch.multinomial(probs, num_samples=1)
                 generated = torch.cat([generated, next_token], dim=-1)
-                print(next_token)
                 if (next_token == self.tokenizer.eos_token_id).all():
                     break
 
@@ -189,10 +188,13 @@ class LocalLLMModel(BaseModel):
 
         # ----- Other runs for robustness divergence -----
         r0 = self.generate_with_temperature(messages, temperature=0.2)
-        r1 = response_only
+        r1 = re.sub(r"<think>[\s\S]*?(?:</think>|$)", "", response_only, flags=re.DOTALL)
         # perturb: 1% of length of r1, at least 1 token
-        perturb_n = max(1, int(0.01 * len(new_tokens[0])))
+        perturb_n = max(1, int(0.01 * (outputs.shape[1] - inputs.shape[1])))
         rh = self.generate_with_temperature(messages, temperature=1.0, perturb_first_n=perturb_n)
+
+        r0 = re.sub(r"<think>[\s\S]*?(?:</think>|$)", "", r0, flags=re.DOTALL)
+        rh = re.sub(r"<think>[\s\S]*?(?:</think>|$)", "", rh, flags=re.DOTALL)
 
         # Pairwise semantic distances
         sims_embed = [
