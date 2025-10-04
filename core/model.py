@@ -65,7 +65,7 @@ class LocalLLMModel(BaseModel):
         self.embedding_model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
         self.entailment_model = pipeline("text-classification", model="roberta-large-mnli")
 
-    def top_k_logits(logits, k):
+    def top_k_logits(self, logits, k):
         # logits: [batch, vocab_size]
         values, indices = torch.topk(logits, k)
         mask = torch.full_like(logits, float('-inf'))
