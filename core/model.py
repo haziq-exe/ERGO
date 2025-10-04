@@ -65,8 +65,14 @@ class LocalLLMModel(BaseModel):
         self.embedding_model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
         self.entailment_model = pipeline("text-classification", model="roberta-large-mnli")
 
+    def top_k_logits(logits, k):
+        # logits: [batch, vocab_size]
+        values, indices = torch.topk(logits, k)
+        mask = torch.full_like(logits, float('-inf'))
+        mask.scatter_(1, indices, values)
+        return mask
 
-    def generate_with_temperature(self, messages, temperature, perturb_first_n=0):
+    def generate_with_temperature(self, messages, temperature, perturb_first_n=0, top_k_value=200):
         """
         Generate with given temperature, 
         with optional hybrid perturbation (first N tokens at temp).
@@ -110,8 +116,11 @@ class LocalLLMModel(BaseModel):
                 # Set temperature based on token position
                 t = 1.5 if i < perturb_first_n else temperature
 
+                logits = logits / t
+                logits = self.top_k_logits(logits, k=top_k_value)
+
                 # Sample next token with temperature
-                probs = F.softmax(logits / t, dim=-1)
+                probs = F.softmax(logits, dim=-1)
                 next_token = torch.multinomial(probs, num_samples=1)
                 
                 # Update generated sequence and attention mask
