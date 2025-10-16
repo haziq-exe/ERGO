@@ -5,12 +5,12 @@
 
 ![ERGO Banner](READMEimg/Representative_Diagram.png)
 
-[![Paper](https://img.shields.io/badge/📄_Read_Paper-8A2BE2?style=for-the-badge)](https://ergopaper.github.io/ERGO/)
+[![Paper](https://img.shields.io/badge/📄_Read_Paper-8A2BE2?style=for-the-badge)](https://ergopaper.github.io/ERGO/static/pdfs/ERGO.pdf)
 [![Python](https://img.shields.io/badge/Python-3.8+-green?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 
 ![Tests](https://github.com/haziq-exe/ERGO/actions/workflows/tests.yml/badge.svg)
 
-• [Paper](https://haziq-exe.github.io/ERGO-paper/) • [Quick Start](https://github.com/haziq-exe/ERGO?tab=readme-ov-file#quick-start) • [Repository Structure](https://github.com/haziq-exe/ERGO?tab=readme-ov-file#repository-structure) • [Results](https://github.com/haziq-exe/ERGO?tab=readme-ov-file#key-results) • [Contact](https://github.com/haziq-exe/ERGO?tab=readme-ov-file#contact) •
+• [Paper Website](https://ergopaper.github.io/ERGO/) • [Quick Start](https://github.com/haziq-exe/ERGO?tab=readme-ov-file#quick-start) • [Repository Structure](https://github.com/haziq-exe/ERGO?tab=readme-ov-file#repository-structure) • [Results](https://github.com/haziq-exe/ERGO?tab=readme-ov-file#key-results) • [Contact](https://github.com/haziq-exe/ERGO?tab=readme-ov-file#contact) •
 
 </div>
 
