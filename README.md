@@ -5,7 +5,7 @@
 
 ![ERGO Banner](READMEimg/Representative_Diagram.png)
 
-[![Paper](https://img.shields.io/badge/📄_Read_Paper-8A2BE2?style=for-the-badge)](https://haziq-exe.github.io/ERGO-paper/)
+[![Paper](https://img.shields.io/badge/📄_Read_Paper-8A2BE2?style=for-the-badge)](https://ergopaper.github.io/ERGO/)
 [![Python](https://img.shields.io/badge/Python-3.8+-green?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 
 ![Tests](https://github.com/haziq-exe/ERGO/actions/workflows/tests.yml/badge.svg)
