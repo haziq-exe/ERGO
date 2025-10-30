@@ -230,12 +230,33 @@ class LocalLLMModel(BaseModel):
             return None
         return float(torch.exp(torch.tensor(avg_entropy)))
     
+    def _extract_hidden_states(self, hidden_states):
+        """
+        Helper to extract tensors from various hidden_states formats.
+        Handles tuples, lists, and nested structures.
+        """
+        if isinstance(hidden_states, tuple):
+            hidden_states = list(hidden_states)
+        
+        extracted = []
+        for h in hidden_states:
+            # Unpack if h itself is a tuple/list
+            if isinstance(h, (tuple, list)):
+                h = h[0]
+            
+            # Only add if it's a tensor with 3 dimensions
+            if isinstance(h, torch.Tensor) and h.dim() == 3:
+                extracted.append(h)
+        
+        return extracted
+
     def get_covariance_entropy(self, hidden_states):
         """
         Estimate differential entropy (Gaussian approx) per-layer.
         Uses stable slogdet computation. Returns list[per-layer_entropy].
         Each layer tensor shape: [batch, seq_len, dim] - we flatten over timesteps and batch.
         """
+        hidden_states = self._extract_hidden_states(hidden_states)
         layer_entropies = []
         for h in hidden_states:
             # flatten samples across batch and timesteps -> [N, dim]
@@ -261,6 +282,7 @@ class LocalLLMModel(BaseModel):
         Measures how uniformly variance is distributed across principal components.
         Higher entropy = more uniform spread; Lower entropy = variance concentrated in few components.
         """
+        hidden_states = self._extract_hidden_states(hidden_states)
         layer_entropies = []
         for h in hidden_states:
             N, L, D = h.shape
@@ -317,6 +339,7 @@ class LocalLLMModel(BaseModel):
         reflecting how uniform or varied the temporal dynamics are.
         Higher entropy = more varied transition patterns; Lower entropy = more uniform changes.
         """
+        hidden_states = self._extract_hidden_states(hidden_states)
         layer_entropies = []
         for h in hidden_states:
             # h: [batch, seq_len, dim]
@@ -368,6 +391,7 @@ class LocalLLMModel(BaseModel):
         Alternative: Measure entropy of transition directions (not magnitudes).
         Captures how predictable/consistent the direction of change is across time.
         """
+        hidden_states = self._extract_hidden_states(hidden_states)
         layer_entropies = []
         for h in hidden_states:
             N, L, D = h.shape
@@ -425,6 +449,7 @@ class LocalLLMModel(BaseModel):
         
         Higher entropy = sensitivity uniformly distributed; Lower entropy = some positions much more sensitive
         """
+        hidden_states = self._extract_hidden_states(hidden_states)
         layer_entropies = []
         for h in hidden_states:
             N, L, D = h.shape
@@ -482,6 +507,7 @@ class LocalLLMModel(BaseModel):
         Alternative: Measure which dimensions are most sensitive to perturbations.
         Computes entropy over dimension-wise sensitivity distribution.
         """
+        hidden_states = self._extract_hidden_states(hidden_states)
         layer_entropies = []
         for h in hidden_states:
             N, L, D = h.shape
@@ -521,6 +547,7 @@ class LocalLLMModel(BaseModel):
         Advanced: Estimate local sensitivity via numerical Jacobian.
         Measures how much small perturbations in input dimensions affect output dimensions.
         """
+        hidden_states = self._extract_hidden_states(hidden_states)
         layer_entropies = []
         for h in hidden_states:
             N, L, D = h.shape
