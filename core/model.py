@@ -164,6 +164,16 @@ class LocalLLMModel(BaseModel):
 
             scores = outputs.scores
             hidden_states = outputs.hidden_states
+
+            print(f"Type: {type(hidden_states)}")
+            print(f"Num steps: {len(hidden_states)}")
+            if len(hidden_states) > 0:
+                print(f"Type of first step: {type(hidden_states[0])}")
+                print(f"Num layers: {len(hidden_states[0])}")
+                if len(hidden_states[0]) > 0:
+                    print(f"First layer, first step shape: {hidden_states[0][0].shape}")
+            
+
             if scores:
                 base_dev = scores[0].device
                 logits = torch.stack([s.to(base_dev) for s in scores])
@@ -184,9 +194,6 @@ class LocalLLMModel(BaseModel):
             gc.collect()
             torch.cuda.empty_cache()
 
-        # ----- Semantic Entropy Runs -----
-        semantic_entropy = self.run_semantic_entropy(messages, runs=3)
-
         # ----- Hidden State Entropy -----
         cov_entropy = self.get_covariance_entropy(hidden_states)
         pca_entropy = self.get_pca_entropy(hidden_states)
@@ -196,6 +203,9 @@ class LocalLLMModel(BaseModel):
         perturbation_entropy_jacobian = self.get_perturbation_entropy_jacobian(hidden_states)
         perturbation_entropy_dimwise = self.get_perturbation_entropy_dimwise(hidden_states)
 
+        # ----- Semantic Entropy Runs -----
+        semantic_entropy = self.run_semantic_entropy(messages, runs=3)
+        
         return {
             "avg_entropy": avg_entropy,
             "norm_entropy": norm_entropy,
@@ -233,22 +243,47 @@ class LocalLLMModel(BaseModel):
     def _extract_hidden_states(self, hidden_states):
         """
         Helper to extract tensors from various hidden_states formats.
-        Handles tuples, lists, and nested structures.
+        Handles the nested tuple structure from model.generate() with output_hidden_states=True.
+        
+        Input format: tuple of tuples
+            hidden_states[step][layer] = tensor of shape [batch, 1, hidden_dim]
+        
+        Output format: list of tensors
+            result[layer] = tensor of shape [batch, num_steps, hidden_dim]
         """
-        if isinstance(hidden_states, tuple):
-            hidden_states = list(hidden_states)
+        if not hidden_states or len(hidden_states) == 0:
+            return []
         
-        extracted = []
-        for h in hidden_states:
-            # Unpack if h itself is a tuple/list
-            if isinstance(h, (tuple, list)):
-                h = h[0]
-            
-            # Only add if it's a tensor with 3 dimensions
-            if isinstance(h, torch.Tensor) and h.dim() == 3:
-                extracted.append(h)
+        # hidden_states is a tuple of tuples: (step_0, step_1, ..., step_n)
+        # where each step_i is a tuple: (layer_0, layer_1, ..., layer_m)
         
-        return extracted
+        num_steps = len(hidden_states)
+        num_layers = len(hidden_states[0]) if hidden_states[0] else 0
+        
+        if num_layers == 0:
+            return []
+        
+        # Transpose: collect all steps for each layer
+        layer_tensors = []
+        for layer_idx in range(num_layers):
+            try:
+                # Collect this layer's hidden states across all generation steps
+                layer_steps = []
+                for step_idx in range(num_steps):
+                    step_hidden = hidden_states[step_idx][layer_idx]
+                    if isinstance(step_hidden, torch.Tensor):
+                        layer_steps.append(step_hidden)
+                
+                if layer_steps:
+                    # Concatenate along sequence dimension
+                    # Each tensor is [batch, 1, hidden_dim], concat to [batch, num_steps, hidden_dim]
+                    layer_tensor = torch.cat(layer_steps, dim=1)
+                    layer_tensors.append(layer_tensor)
+            except (IndexError, TypeError) as e:
+                print(f"Warning: Could not extract layer {layer_idx}: {e}")
+                continue
+        
+        return layer_tensors
 
     def get_covariance_entropy(self, hidden_states):
         """
