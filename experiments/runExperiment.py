@@ -70,3 +70,11 @@ class RunExperiment():
         evaluator = DataToTextEvaluator(output_file=output_path, dataset_path=dataset_path)
         runner = RunERGO(model=self.model, dataset=dataset, ergo=ergo, logger=logger, evaluator=evaluator, num_Qs=num_Qs, num_runs=num_runs)
         runner.execute(clear_cache=self.clear_cache)
+
+    # def run_GSM8K_FULL(self, dataset_path, output_path, threshold=0.5, num_runs=1):
+    #     dataset = GSM8K(dataset_path=dataset_path)
+    #     ergo = Ergo(model=self.model, threshold=float('inf'))
+    #     logger = Logger(model=self.model, dataset=dataset, output_path=output_path)
+    #     evaluator = GSM8KEvaluator(output_file=output_path, dataset_path=dataset_path)
+    #     runner = RunERGO_FULL(model=self.model, dataset=dataset, ergo=ergo, logger=logger, evaluator=evaluator, num_Qs=None, num_runs=num_runs)
+    #     runner.execute(clear_cache=self.clear_cache)

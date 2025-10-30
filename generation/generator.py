@@ -34,9 +34,9 @@ class RunERGO():
                 item = self.dataset.data[question]
                 messages = [self.dataset.get_base_system(question)]
                 message_history = []
-                entropies = {"avg_entropy": [], "rds_entail": [], "rds_embed": [], "margin": [], "norm_entropy": [], "perplexity": []}
                 prev_entropy = float("inf")
                 resets = []
+                entropies = {}
 
                 for shard in item["shards"]:
                     user_content = shard['shard']
@@ -47,13 +47,13 @@ class RunERGO():
                         user_content += self.dataset.final_shard_instruct
                     messages.append({"role": "user", "content": user_content})
 
-                    entropy, new_message, reset, messages, prev_prompts, r0, rh = self.ergo.run(messages, self.dataset, prev_entropy)
+                    entropy, new_message, reset, messages, prev_prompts = self.ergo.run(messages, self.dataset, prev_entropy)
                     messages.append({"role": "assistant", "content": new_message})
-                    prev_entropy = entropy
-                    message_history.append({"r0": r0, "rh": rh})
-                    
-                    for k in entropies.keys():
-                        entropies[k].append(entropy[k])
+                    prev_entropy = float("inf")
+                    for key in entropy.keys():
+                        if key not in entropies.keys():
+                            entropies[key] = []
+                        entropies[key].append(entropy[key])
 
                     if reset:
                         resets.append(1)
@@ -81,6 +81,46 @@ class RunERGO():
                         
                         break
 
+# class RunERGO_FULL(RunERGO):
+#     def __init__(self, model: BaseModel, dataset: Dataset, evaluator: Evaluator,  ergo: Ergo, logger: Logger, num_Qs : int = None, num_runs : int = 1):
+#         super().__init__(model, dataset, evaluator, ergo, logger, num_Qs, num_runs)
+
+#     def execute(self, spider_DB_path=None, clear_cache=False):
+#         for run in range(self.num_runs):
+#             for question in range(self.num_Qs):
+#                 item = self.dataset.data[question]
+#                 messages = [self.dataset.get_base_system(question)]
+#                 message_history = []
+#                 entropies = {"avg_entropy": [], "rds_entail": [], "rds_embed": [], "margin": [], "norm_entropy": [], "perplexity": []}
+#                 prev_entropy = float("inf")
+#                 resets = []
+
+#                 user_content = item['full_input']
+#                 messages.append({"role": "user", "content": user_content})
+
+#                 entropy, new_message, reset, messages, prev_prompts, r0, rh = self.ergo.run(messages, self.dataset, prev_entropy)
+#                 messages.append({"role": "assistant", "content": new_message})
+#                 prev_entropy = entropy
+#                 message_history.append({"r0": r0, "rh": rh})
                 
+#                 for k in entropies.keys():
+#                     entropies[k].append(entropy[k])
+
+#                 if reset:
+#                     resets.append(1)
+#                 else:
+#                     resets.append(0)
+
+#                 if self.evaluator.identifier() == "Database":
+#                     result = self.evaluator.evaluate(dataset=self.dataset, extracted_answer=new_message, spider_DB_path=spider_DB_path, question_id=question)
+#                 else:
+#                     result = self.evaluator.evaluate(dataset=self.dataset, extracted_answer=new_message, question_id=question)
+
+#                 self.logger.log_entry(question, messages, new_message, entropies, resets, result, message_history)
+#                 self.logger.save(run)
+                
+#                 if clear_cache:
+#                     gc.collect()
+#                     torch.cuda.empty_cache()
             
 
