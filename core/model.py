@@ -451,7 +451,6 @@ class LocalLLMModel(BaseModel):
                 pad_token_id=self.tokenizer.eos_token_id,
                 eos_token_id=self.tokenizer.eos_token_id,
                 temperature=self.temperature,
-                output_attentions=True,
             )
 
 
@@ -459,13 +458,11 @@ class LocalLLMModel(BaseModel):
         new_tokens = response_ids[:, input_length:].cpu()
         response_only = self.tokenizer.batch_decode(new_tokens, skip_special_tokens=True)[0]
 
-        attentions = outputs.attentions
-
         if clear_cache:
             gc.collect()
             torch.cuda.empty_cache()
 
-        return response_only, attentions
+        return response_only
     
 class OpenAIModel(BaseModel):
 

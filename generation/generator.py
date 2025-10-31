@@ -94,7 +94,7 @@ class RunERGO():
                 print("Full Prompt: " + prompt)
 
                 messages.append({"role": "user", "content": prompt})
-                response, attention_scores = self.ergo.run_FULL(messages)
+                response = self.ergo.run_FULL(messages)
 
                 if self.evaluator.identifier() == "Database":
                     result = self.evaluator.evaluate(dataset=self.dataset, extracted_answer=response, spider_DB_path=spider_DB_path, question_id=question)
@@ -109,7 +109,7 @@ class RunERGO():
 
                 messages.append({"role": "assistant", "content": response})
 
-                self.logger.log_entry_full(question, messages, attention_scores, result)
+                self.logger.log_entry_full(question, messages, result)
                 self.logger.save(run)
                 
                 if clear_cache:
