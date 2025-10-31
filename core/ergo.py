@@ -93,7 +93,7 @@ class Ergo:
         - Check entropy
         - If above threshold, rewrite prompt, start new context with just rewritten prompt and regenerate
         """
-        response, attention_scores = self.model.generate(sharded_prompt)
+        response, attention_scores = self.model.generate_FULL(sharded_prompt)
 
         response = re.sub(r"<think>[\s\S]*?(?:</think>|$)", "", response, flags=re.DOTALL)
 
