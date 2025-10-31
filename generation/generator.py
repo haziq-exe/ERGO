@@ -90,6 +90,8 @@ class RunERGO():
 
                 for shard in item["shards"]:
                     prompt += f"- {shard['shard']}\n"
+                
+                print("Full Prompt: " + prompt)
 
                 messages.append({"role": "user", "content": prompt})
                 response, attention_scores = self.ergo.run_FULL(messages)
