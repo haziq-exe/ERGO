@@ -92,7 +92,7 @@ class RunERGO():
                     prompt += f"- {shard['shard']}\n"
 
                 messages.append({"role": "user", "content": prompt})
-                response, attention_scores = self.ergo.run_FULL(messages, self.dataset)
+                response, attention_scores = self.ergo.run_FULL(messages)
 
                 if self.evaluator.identifier() == "Database":
                     result = self.evaluator.evaluate(dataset=self.dataset, extracted_answer=response, spider_DB_path=spider_DB_path, question_id=question)

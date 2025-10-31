@@ -86,7 +86,7 @@ class Ergo:
 
         return avg_entropy, response, reset, sharded_prompt, prev_prompts
 
-    def run_FULL(self, sharded_prompt, dataset: Dataset, prev_entropy):
+    def run_FULL(self, sharded_prompt):
         """
         Run ERGO on a prompt:
         - Generate response
