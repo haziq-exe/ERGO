@@ -165,7 +165,7 @@ class LocalLLMModel(BaseModel):
             scores = outputs.scores
             hidden_states = outputs.hidden_states
 
-            print(f"FULLY UPDATED Type: {type(hidden_states)}")
+            print(f"FINAL UPDATED Type: {type(hidden_states)}")
             print(f"Num steps: {len(hidden_states)}")
             if len(hidden_states) > 0:
                 print(f"Type of first step: {type(hidden_states[0])}")
@@ -198,9 +198,6 @@ class LocalLLMModel(BaseModel):
         cov_entropy = self.get_covariance_entropy(hidden_states)
         pca_entropy = self.get_pca_entropy(hidden_states)
         transition_entropy = self.get_transition_entropy(hidden_states)
-        transition_entropy_directional = self.get_transition_entropy_directional(hidden_states)
-        perturbation_entropy = self.get_perturbation_entropy(hidden_states)
-        perturbation_entropy_jacobian = self.get_perturbation_entropy_jacobian(hidden_states)
         perturbation_entropy_dimwise = self.get_perturbation_entropy_dimwise(hidden_states)
 
         # ----- Semantic Entropy Runs -----
@@ -213,9 +210,6 @@ class LocalLLMModel(BaseModel):
             "cov_entropy": cov_entropy,
             "pca_entropy": pca_entropy,
             "transition_entropy": transition_entropy,
-            "transition_entropy_directional": transition_entropy_directional,
-            "perturbation_entropy": perturbation_entropy,
-            "perturbation_entropy_jacobian": perturbation_entropy_jacobian,
             "perturbation_entropy_dimwise": perturbation_entropy_dimwise,
         }, response_only
 
@@ -296,7 +290,6 @@ class LocalLLMModel(BaseModel):
             layer_entropies.append(float(h_entropy))
         return layer_entropies
 
-
     def get_pca_entropy(self, hidden_states):
         """
         Spectral entropy: Shannon entropy of normalized eigenvalues from covariance matrix.
@@ -346,7 +339,6 @@ class LocalLLMModel(BaseModel):
         
         return layer_entropies
 
-
     def get_transition_entropy(self, hidden_states):
         """
         Measure entropy of temporal transitions between consecutive timesteps.
@@ -392,100 +384,6 @@ class LocalLLMModel(BaseModel):
         
         return layer_entropies
 
-
-    def get_transition_entropy_directional(self, hidden_states):
-        """
-        Measure entropy of transition directions.
-        """
-        hidden_states = self._extract_hidden_states(hidden_states)
-        layer_entropies = []
-        for h in hidden_states:
-            N, L, D = h.shape
-            
-            if L < 3:
-                layer_entropies.append(0.0)
-                continue
-            
-            h = h.float()
-            
-            transitions = h[:, 1:, :] - h[:, :-1, :]
-            transition_norms = torch.norm(transitions, dim=-1, keepdim=True)
-            transition_dirs = transitions / (transition_norms + 1e-8)
-            
-            if transition_dirs.shape[1] < 2:
-                layer_entropies.append(0.0)
-                continue
-                
-            sims = F.cosine_similarity(
-                transition_dirs[:, 1:, :], 
-                transition_dirs[:, :-1, :], 
-                dim=-1
-            )
-            
-            all_sims = sims.reshape(-1).float()
-            all_sims_normalized = (all_sims + 1.0) / 2.0
-            
-            n_bins = min(30, len(all_sims_normalized) // 10)
-            n_bins = max(n_bins, 10)
-            
-            # ALL GPU
-            hist = torch.histc(all_sims_normalized, bins=n_bins, min=0.0, max=1.0)
-            hist = hist + 1e-12
-            probs = hist / hist.sum()
-            
-            ent = -(probs * torch.log(probs)).sum().item()
-            layer_entropies.append(float(ent))
-        
-        return layer_entropies
-
-
-    def get_perturbation_entropy(self, hidden_states, noise_scales=(1e-3, 1e-2, 1e-1), n_samples=10):
-        """
-        Measure entropy of sensitivity to perturbations.
-        """
-        hidden_states = self._extract_hidden_states(hidden_states)
-        layer_entropies = []
-        for h in hidden_states:
-            N, L, D = h.shape
-            h_flat = h.reshape(N * L, D).float()  # Stays on GPU
-            
-            ent_scales = []
-            for scale in noise_scales:
-                sensitivity_scores = []
-                
-                for _ in range(n_samples):
-                    noise = torch.randn_like(h_flat) * float(scale)
-                    h_pert = h_flat + noise
-                    
-                    position_sensitivity = torch.norm(h_pert - h_flat, dim=-1) / (torch.norm(h_flat, dim=-1) + 1e-8)
-                    sensitivity_scores.append(position_sensitivity)
-                
-                avg_sensitivity = torch.stack(sensitivity_scores).mean(dim=0)
-                avg_sensitivity = avg_sensitivity[avg_sensitivity > 1e-10]
-                
-                if len(avg_sensitivity) < 2:
-                    ent_scales.append(0.0)
-                    continue
-                
-                n_bins = min(50, len(avg_sensitivity) // 10)
-                n_bins = max(n_bins, 10)
-                
-                avg_sensitivity = avg_sensitivity.float()
-                hist = torch.histc(avg_sensitivity, bins=n_bins,
-                                min=avg_sensitivity.min().item(),
-                                max=avg_sensitivity.max().item())
-                
-                hist = hist + 1e-12
-                probs = hist / hist.sum()
-                
-                ent = -(probs * torch.log(probs)).sum().item()
-                ent_scales.append(ent)
-            
-            layer_entropies.append(float(np.mean(ent_scales)))
-        
-        return layer_entropies
-
-
     def get_perturbation_entropy_dimwise(self, hidden_states, noise_scales=(1e-3, 1e-2, 1e-1), n_samples=10):
         """
         Measure which dimensions are most sensitive to perturbations.
@@ -517,59 +415,7 @@ class LocalLLMModel(BaseModel):
             layer_entropies.append(float(np.mean(ent_scales)))
         
         return layer_entropies
-
-
-    def get_perturbation_entropy_jacobian(self, hidden_states, epsilon=1e-4, n_samples=20):
-        """
-        Estimate local sensitivity via numerical Jacobian.
-        """
-        hidden_states = self._extract_hidden_states(hidden_states)
-        layer_entropies = []
-        for h in hidden_states:
-            N, L, D = h.shape
-            h_flat = h.reshape(N * L, D).float()
-            
-            n_positions = min(n_samples, h_flat.shape[0])
-            indices = torch.randperm(h_flat.shape[0], device=h_flat.device)[:n_positions]
-            h_sample = h_flat[indices]
-            
-            sensitivities = []
-            
-            for i in range(n_positions):
-                pos = h_sample[i:i+1]
-                
-                dim_sensitivity = []
-                for d in range(D):
-                    pos_plus = pos.clone()
-                    pos_plus[0, d] += epsilon
-                    
-                    change = torch.norm(pos_plus - pos).item()
-                    dim_sensitivity.append(change)
-                
-                sensitivities.extend(dim_sensitivity)
-            
-            # Create tensor on same device
-            sensitivities = torch.tensor(sensitivities, dtype=torch.float32, device=h_flat.device)
-            sensitivities = sensitivities[sensitivities > 1e-10]
-            
-            if len(sensitivities) < 2:
-                layer_entropies.append(0.0)
-                continue
-            
-            n_bins = min(30, len(sensitivities) // 10)
-            n_bins = max(n_bins, 10)
-            
-            hist = torch.histc(sensitivities, bins=n_bins,
-                            min=sensitivities.min().item(),
-                            max=sensitivities.max().item())
-            hist = hist + 1e-12
-            probs = hist / hist.sum()
-            
-            ent = -(probs * torch.log(probs)).sum().item()
-            layer_entropies.append(float(ent))
-        
-        return layer_entropies
-
+    
 class OpenAIModel(BaseModel):
 
     def __init__(self, model_name, temperature, max_tokens, top_logprobs: int = 20):
