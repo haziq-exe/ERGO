@@ -165,7 +165,7 @@ class LocalLLMModel(BaseModel):
             scores = outputs.scores
             hidden_states = outputs.hidden_states
 
-            print(f"Type: {type(hidden_states)}")
+            print(f"UPDATED Type: {type(hidden_states)}")
             print(f"Num steps: {len(hidden_states)}")
             if len(hidden_states) > 0:
                 print(f"Type of first step: {type(hidden_states[0])}")
