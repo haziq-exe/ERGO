@@ -32,6 +32,14 @@ class BaseModel:
         """
         raise NotImplementedError
 
+    def generate_FULL(self, prompt):
+        """
+        Generate text using a local Hugging Face model or OpenAI API.
+        Used in FULL mode where the entire question is given at once.
+        Returns: generated_text
+        """
+        raise NotImplementedError
+    
     def compute_entropy(self, output: Any) -> float:
         """
         Compute the average token-level entropy of the generated text.
@@ -165,13 +173,13 @@ class LocalLLMModel(BaseModel):
             scores = outputs.scores
             hidden_states = outputs.hidden_states
 
-            print(f"FINAL UPDATED Type: {type(hidden_states)}")
-            print(f"Num steps: {len(hidden_states)}")
-            if len(hidden_states) > 0:
-                print(f"Type of first step: {type(hidden_states[0])}")
-                print(f"Num layers: {len(hidden_states[0])}")
-                if len(hidden_states[0]) > 0:
-                    print(f"First layer, first step shape: {hidden_states[0][0].shape}")
+            # print(f"FINAL UPDATED Type: {type(hidden_states)}")
+            # print(f"Num steps: {len(hidden_states)}")
+            # if len(hidden_states) > 0:
+            #     print(f"Type of first step: {type(hidden_states[0])}")
+            #     print(f"Num layers: {len(hidden_states[0])}")
+            #     if len(hidden_states[0]) > 0:
+            #         print(f"First layer, first step shape: {hidden_states[0][0].shape}")
             
 
             if scores:
@@ -385,6 +393,7 @@ class LocalLLMModel(BaseModel):
         return layer_entropies
 
     def get_perturbation_entropy_dimwise(self, hidden_states, noise_scales=(1e-3, 1e-2, 1e-1), n_samples=10):
+
         """
         Measure which dimensions are most sensitive to perturbations.
         """
@@ -415,6 +424,48 @@ class LocalLLMModel(BaseModel):
             layer_entropies.append(float(np.mean(ent_scales)))
         
         return layer_entropies
+
+    def generate_FULL(self, messages, clear_cache=True):
+        """
+        Original generate function that returns avg_entropy only.
+        Device-aware generation for single-device and device_map='auto' sharded models.
+        Returns: (avg_entropy, generated_text)
+        """
+
+        prompt = self.tokenizer.apply_chat_template(
+            messages,
+            tokenize=False,
+            add_generation_prompt=True
+        )
+
+        inputs = self.tokenizer(prompt, return_tensors="pt", truncation=True)
+        inputs = {k: v.to(self.model.device) for k, v in inputs.items()}
+        input_length = inputs["input_ids"].shape[1]
+
+        with torch.no_grad():
+            outputs = self.model.generate(
+                **inputs,
+                max_new_tokens=self.max_new_tokens,
+                return_dict_in_generate=True,
+                do_sample=self.do_sample,
+                pad_token_id=self.tokenizer.eos_token_id,
+                eos_token_id=self.tokenizer.eos_token_id,
+                temperature=self.temperature,
+                output_attentions=True,
+            )
+
+
+        response_ids = outputs.sequences
+        new_tokens = response_ids[:, input_length:].cpu()
+        response_only = self.tokenizer.batch_decode(new_tokens, skip_special_tokens=True)[0]
+
+        attentions = outputs.attentions
+
+        if clear_cache:
+            gc.collect()
+            torch.cuda.empty_cache()
+
+        return response_only, attentions
     
 class OpenAIModel(BaseModel):
 

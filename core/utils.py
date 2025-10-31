@@ -38,6 +38,22 @@ class Logger:
             "message_history": message_history
         }
         self.logs.append(entry)
+    
+    def log_entry_full(self, item_id, chat_history, attention_scores, result):
+        """
+        Log a single entry consisting of:
+        - item_id: unique identifier for the data item
+        - chat_history: list of (user_message, model_response) tuples
+        - attention_scores: attention scores from the model
+        - result: evaluation result
+        """
+        entry = {
+            "item_id": item_id,
+            "chat_history": chat_history,
+            "attention_scores": attention_scores,
+            "result": result
+        }
+        self.logs.append(entry)
 
     def save(self, i):
         """

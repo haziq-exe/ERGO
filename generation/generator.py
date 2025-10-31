@@ -81,6 +81,39 @@ class RunERGO():
                         
                         break
 
+    def execute_full(self, spider_DB_path=None, clear_cache=False):
+        for run in range(self.num_runs):
+            for question in range(self.num_Qs):
+                item = self.dataset.data[question]
+                messages = [self.dataset.get_base_system(question)]
+                prompt = "Task: \n"
+
+                for shard in item["shards"]:
+                    prompt += f"- {shard['shard']}\n"
+
+                messages.append({"role": "user", "content": prompt})
+                response, attention_scores = self.ergo.run_FULL(messages, self.dataset)
+
+                if self.evaluator.identifier() == "Database":
+                    result = self.evaluator.evaluate(dataset=self.dataset, extracted_answer=response, spider_DB_path=spider_DB_path, question_id=question)
+                elif self.evaluator.identifier() == "DataToText":
+                    continue
+                else:
+                    result = self.evaluator.evaluate(dataset=self.dataset, extracted_answer=response, question_id=question)
+
+                if shard['shard_id'] == len(item["shards"]) or result["score"] == 1.0:
+                    if self.evaluator.identifier() == "DataToText":
+                        result = self.evaluator.evaluate(dataset=self.dataset, extracted_answer=response, question_id=question)
+
+                messages.append({"role": "assistant", "content": response})
+
+                self.logger.log_entry_full(question, messages, attention_scores, result)
+                self.logger.save(run)
+                
+                if clear_cache:
+                    gc.collect()
+                    torch.cuda.empty_cache()
+                    
 # class RunERGO_FULL(RunERGO):
 #     def __init__(self, model: BaseModel, dataset: Dataset, evaluator: Evaluator,  ergo: Ergo, logger: Logger, num_Qs : int = None, num_runs : int = 1):
 #         super().__init__(model, dataset, evaluator, ergo, logger, num_Qs, num_runs)

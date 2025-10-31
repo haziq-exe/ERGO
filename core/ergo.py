@@ -85,3 +85,16 @@ class Ergo:
         response = re.sub(r"<think>[\s\S]*?(?:</think>|$)", "", response, flags=re.DOTALL)
 
         return avg_entropy, response, reset, sharded_prompt, prev_prompts
+
+    def run_FULL(self, sharded_prompt, dataset: Dataset, prev_entropy):
+        """
+        Run ERGO on a prompt:
+        - Generate response
+        - Check entropy
+        - If above threshold, rewrite prompt, start new context with just rewritten prompt and regenerate
+        """
+        response, attention_scores = self.model.generate(sharded_prompt)
+
+        response = re.sub(r"<think>[\s\S]*?(?:</think>|$)", "", response, flags=re.DOTALL)
+
+        return response, attention_scores
