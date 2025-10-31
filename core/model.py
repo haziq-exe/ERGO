@@ -205,7 +205,7 @@ class LocalLLMModel(BaseModel):
 
         # ----- Semantic Entropy Runs -----
         semantic_entropy = self.run_semantic_entropy(messages, runs=3)
-        
+
         return {
             "avg_entropy": avg_entropy,
             "norm_entropy": norm_entropy,
@@ -384,6 +384,9 @@ class LocalLLMModel(BaseModel):
                 layer_entropies.append(0.0)
                 continue
             
+            # Convert to float32 for numerical operations
+            h = h.float()
+            
             # Compute transitions across all batch samples for better statistics
             # [batch, seq_len-1, dim]
             transitions = h[:, 1:, :] - h[:, :-1, :]
@@ -406,6 +409,8 @@ class LocalLLMModel(BaseModel):
             n_bins = min(50, len(all_transitions) // 10)  # Adaptive binning
             n_bins = max(n_bins, 10)  # At least 10 bins
             
+            # Ensure float32 for histc
+            all_transitions = all_transitions.float()
             hist = torch.histc(all_transitions, bins=n_bins, 
                             min=all_transitions.min().item(), 
                             max=all_transitions.max().item())
@@ -418,9 +423,10 @@ class LocalLLMModel(BaseModel):
             ent = -torch.sum(probs * torch.log(probs)).item()
             
             layer_entropies.append(float(ent))
-    
+        
         return layer_entropies
-    
+
+
     def get_transition_entropy_directional(self, hidden_states):
         """
         Alternative: Measure entropy of transition directions (not magnitudes).
@@ -434,6 +440,9 @@ class LocalLLMModel(BaseModel):
             if L < 3:  # Need at least 3 timesteps for 2 transitions
                 layer_entropies.append(0.0)
                 continue
+            
+            # Convert to float32
+            h = h.float()
             
             # Compute transitions: [batch, seq_len-1, dim]
             transitions = h[:, 1:, :] - h[:, :-1, :]
@@ -455,7 +464,7 @@ class LocalLLMModel(BaseModel):
             )  # [batch, seq_len-2]
             
             # Flatten across batch: [batch * (seq_len-2)]
-            all_sims = sims.reshape(-1)
+            all_sims = sims.reshape(-1).float()
             
             # Map similarities from [-1, 1] to [0, 1] for histogram
             all_sims_normalized = (all_sims + 1.0) / 2.0
@@ -473,22 +482,16 @@ class LocalLLMModel(BaseModel):
         
         return layer_entropies
 
+
     def get_perturbation_entropy(self, hidden_states, noise_scales=(1e-3, 1e-2, 1e-1), n_samples=10):
         """
         Measure entropy of sensitivity to perturbations across the representation space.
-        
-        For each position in the hidden state, we measure how much the representation
-        changes under random perturbations. The entropy of this sensitivity distribution
-        tells us whether sensitivity is uniform (high entropy) or concentrated in 
-        specific positions/dimensions (low entropy).
-        
-        Higher entropy = sensitivity uniformly distributed; Lower entropy = some positions much more sensitive
         """
         hidden_states = self._extract_hidden_states(hidden_states)
         layer_entropies = []
         for h in hidden_states:
             N, L, D = h.shape
-            h_flat = h.reshape(N * L, D).float()  # [N*L, D]
+            h_flat = h.reshape(N * L, D).float()  # Convert to float32
             
             ent_scales = []
             for scale in noise_scales:
@@ -500,8 +503,7 @@ class LocalLLMModel(BaseModel):
                     noise = torch.randn_like(h_flat) * float(scale)
                     h_pert = h_flat + noise
                     
-                    # Measure change in representation per position (not just recovering noise!)
-                    # Option 1: Use relative change
+                    # Measure change in representation per position
                     position_sensitivity = torch.norm(h_pert - h_flat, dim=-1) / (torch.norm(h_flat, dim=-1) + 1e-8)
                     sensitivity_scores.append(position_sensitivity)
                 
@@ -519,6 +521,8 @@ class LocalLLMModel(BaseModel):
                 n_bins = min(50, len(avg_sensitivity) // 10)
                 n_bins = max(n_bins, 10)
                 
+                # Ensure float32 for histc
+                avg_sensitivity = avg_sensitivity.float()
                 hist = torch.histc(avg_sensitivity, bins=n_bins,
                                 min=avg_sensitivity.min().item(),
                                 max=avg_sensitivity.max().item())
@@ -536,7 +540,7 @@ class LocalLLMModel(BaseModel):
         
         return layer_entropies
 
-    # Alternative: Dimension-wise sensitivity entropy
+
     def get_perturbation_entropy_dimwise(self, hidden_states, noise_scales=(1e-3, 1e-2, 1e-1), n_samples=10):
         """
         Alternative: Measure which dimensions are most sensitive to perturbations.
@@ -546,7 +550,7 @@ class LocalLLMModel(BaseModel):
         layer_entropies = []
         for h in hidden_states:
             N, L, D = h.shape
-            h_flat = h.reshape(N * L, D).float()  # [N*L, D]
+            h_flat = h.reshape(N * L, D).float()  # Convert to float32
             
             ent_scales = []
             for scale in noise_scales:
@@ -576,17 +580,15 @@ class LocalLLMModel(BaseModel):
         return layer_entropies
 
 
-    # Alternative: Measure sensitivity via gradient-like approach
     def get_perturbation_entropy_jacobian(self, hidden_states, epsilon=1e-4, n_samples=20):
         """
         Advanced: Estimate local sensitivity via numerical Jacobian.
-        Measures how much small perturbations in input dimensions affect output dimensions.
         """
         hidden_states = self._extract_hidden_states(hidden_states)
         layer_entropies = []
         for h in hidden_states:
             N, L, D = h.shape
-            h_flat = h.reshape(N * L, D).float()
+            h_flat = h.reshape(N * L, D).float()  # Convert to float32
             
             # Sample a subset of positions for efficiency
             n_positions = min(n_samples, h_flat.shape[0])
@@ -611,7 +613,7 @@ class LocalLLMModel(BaseModel):
                 
                 sensitivities.extend(dim_sensitivity)
             
-            sensitivities = torch.tensor(sensitivities)
+            sensitivities = torch.tensor(sensitivities, dtype=torch.float32)
             sensitivities = sensitivities[sensitivities > 1e-10]
             
             if len(sensitivities) < 2:
@@ -632,7 +634,7 @@ class LocalLLMModel(BaseModel):
             layer_entropies.append(float(ent))
         
         return layer_entropies
-    
+
 class OpenAIModel(BaseModel):
 
     def __init__(self, model_name, temperature, max_tokens, top_logprobs: int = 20):
