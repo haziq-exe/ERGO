@@ -203,20 +203,20 @@ class LocalLLMModel(BaseModel):
             torch.cuda.empty_cache()
 
         # ----- Hidden State Entropy -----
-        cov_entropy = self.get_covariance_entropy(hidden_states)
-        pca_entropy = self.get_pca_entropy(hidden_states)
+        # cov_entropy = self.get_covariance_entropy(hidden_states)
+        # pca_entropy = self.get_pca_entropy(hidden_states)
         transition_entropy = self.get_transition_entropy(hidden_states)
         perturbation_entropy_dimwise = self.get_perturbation_entropy_dimwise(hidden_states)
 
         # ----- Semantic Entropy Runs -----
-        semantic_entropy = self.run_semantic_entropy(messages, runs=3)
+        semantic_entropy = self.run_semantic_entropy(messages, runs=5)
 
         return {
             "avg_entropy": avg_entropy,
             "norm_entropy": norm_entropy,
             "semantic_entropy": semantic_entropy,
-            "cov_entropy": cov_entropy,
-            "pca_entropy": pca_entropy,
+            # "cov_entropy": cov_entropy,
+            # "pca_entropy": pca_entropy,
             "transition_entropy": transition_entropy,
             "perturbation_entropy_dimwise": perturbation_entropy_dimwise,
         }, response_only
