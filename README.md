@@ -151,12 +151,24 @@ ERGO has been rigorously tested across five diverse generation tasks:
 If you use ERGO in your research, please cite our paper:
 
 ```bibtex
-@inproceedings{khalid2025ergo,
-  title={ERGO: Entropy-guided Resetting for Generation Optimization in Multi-turn Language Models},
-  author={Khalid, Haziq Mohammad and Jeyaganthan, Athikash and Do, Timothy and 
-          Fu, Yicheng and O'Brien, Sean and Sharma, Vasu and Zhu, Kevin},
-  booktitle={Proceedings of the 2nd Workshop on Uncertainty-Aware NLP @ EMNLP 2025},
-  year={2025}
+@inproceedings{mohammad-khalid-etal-2025-ergo,
+    title = "{ERGO}: Entropy-guided Resetting for Generation Optimization in Multi-turn Language Models",
+    author = "Mohammad Khalid, Haziq  and
+      Jeyaganthan, Athikash  and
+      Do, Timothy  and
+      Fu, Yicheng  and
+      Sharma, Vasu  and
+      O{'}Brien, Sean  and
+      Zhu, Kevin",
+    editor = "Noidea, Noidea",
+    booktitle = "Proceedings of the 2nd Workshop on Uncertainty-Aware NLP (UncertaiNLP 2025)",
+    month = nov,
+    year = "2025",
+    address = "Suzhou, China",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2025.uncertainlp-main.23/",
+    pages = "273--286",
+    ISBN = "979-8-89176-349-4"
 }
 ```
 
