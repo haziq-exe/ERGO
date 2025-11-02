@@ -142,10 +142,6 @@ ERGO has been rigorously tested across five diverse generation tasks:
 
 </div>
 
-## Note
-
-> **Documentation**: More comprehensive documentation is in development. For now, please refer to the paper for detailed methodology and theoretical foundations.
-
 ## Citation
 
 If you use ERGO in your research, please cite our paper:
